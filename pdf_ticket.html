@@ -1,0 +1,454 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <style>
+    @font-face {
+      font-family: 'Helvetica Neue';
+      src: url({{ "Helvetica Neue" | font }});
+      font-weight: normal;
+    }
+    @font-face {
+      font-family: 'Helvetica Neue';
+      src: url({{ "Helvetica Neue Bold" | font }});
+      font-weight: bold;
+    }
+    body {
+      font-family: "Helvetica Neue";
+      font-size: 13px;
+      line-height: 1.4em;
+      font-weight: normal;
+      border:20px solid #FF9E36;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  {% for block in blocks %}
+    {% render_block block.name %}
+  {% endfor %}
+</body>
+</html>
+{% schema %}
+{
+  "name": "Numerana Event Ticket",
+  "type": "template",
+  "blocks": ["numerana-ticket"],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Custom page size"
+    },
+    {
+      "type": "paragraph",
+      "content": "Set a custom page width and height in inches for the PDF ticket. Leave them blank for the default of A4 paper size."
+    },
+    {
+      "id": "page_width",
+      "type": "number",
+      "label": "Page width",
+      "suffix": "inches",
+      "placeholder": "8.27"
+    },
+    {
+      "id": "page_height",
+      "type": "number",
+      "label": "Page height",
+      "suffix": "inches",
+      "placeholder": "11.7"
+    }
+  ],
+  "strings": []
+}
+{% endschema %}
+{% inline 'blocks/numerana-ticket' %}
+<style>
+  body {
+    background-image: url('{{ block.settings.background_image }}');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+    background-color: #e8881c;
+    max-height:;
+    }
+  .numerana-ticket-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin-top: 24rem;
+    padding: {{ block.settings.padding_top }}in {{ block.settings.padding_horizontal }}in {{ block.settings.padding_bottom }}in;
+  }
+  .ticket-card {
+    background-color: transparent;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    padding: 15px 5px;
+    max-width: 7.5in;
+    width: 100%;
+  }
+  .event-detail {
+    color: white;
+    text-align: center;
+    border: 1px solid white;
+    border-radius: 18px;
+    padding: 20px 15px;
+    font-weight: 700;
+    margin: 5px;
+    font-family: "Times New Roman", serif;
+  }
+  .event-title {
+    text-align: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  }
+  .event-title h1 {
+    font-size: 30px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.2;
+    margin: 0;
+    font-family: "Helvetica Neue";
+  }
+  .event-datetime {
+    text-align: center;
+    margin-bottom: 5px;
+    padding: 12px 0;
+  }
+  .date-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-style: italic;
+  }
+  .date-main, .time-main {
+    font-size: 24px;
+    font-weight: 500;
+    color: #ffffff;
+  }
+  .date-divider {
+    font-size: 24px;
+    color: #ffffff;
+    font-weight: 300;
+  }
+  .event-description {
+    text-align: center;
+    margin: 18px auto 24px;
+    padding: 0 16px;
+    width: 600px;
+  }
+  .event-description p {
+    font-size: 22px;
+    line-height: 1.6;
+    color: #ffffff;
+    margin: 0;
+    font-style: italic;
+  }
+  .info-box {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border: 2px solid #FF9F37;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 0 auto 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    width: 90%;
+  }
+  .qr-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-width: 180px;
+  }
+  .qr-code-image {
+    max-width: 150px;
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    padding: 10px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  .ticket-number {
+    text-align: center;
+  }
+  .ticket-number .info-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    flex: 1;
+  }
+  .info-card {
+    background: transparent;
+    border-radius: 6px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  }
+  .info-label {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .info-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.3;
+    word-wrap: break-word;
+  }
+  .info-card-full {
+    grid-column: 1 / -1;
+  }
+  .venue-info {
+    text-align: center;
+    padding-top: 16px;
+  }
+  .venue-name {
+    font-size: 25px;
+    font-weight: 500;
+    color: #ffffff;
+    margin: 4px 0;
+    line-height: 1.4;
+  }
+  .venue-address {
+    font-size: 25px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 4px 0;
+  }
+  .ticket-card {
+  position: relative; /* Needed for absolute positioning of emblem */
+}
+.corner-emblem {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  width: 150px;
+  height: 150px;
+  background: #FF9F37; 
+ border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+.emblem-letter {
+  font-size: 64px;
+  color: #0f2c70;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  line-height: 1;
+}
+</style>
+</style>
+<div class="numerana-ticket-container">
+{% if attendee.ticket.title == "Planta Alta" %}
+  <div class="corner-emblem">
+    <span class="emblem-letter">A</span>
+  </div>
+{% elsif attendee.ticket.title == "Planta Baja" %}
+  <div class="corner-emblem">
+    <span class="emblem-letter">B</span>
+  </div>
+{% endif %}
+  <div class="ticket-card">
+  <div class=" event-detail">
+  <!-- Event Title -->
+    <div class="event-title">
+      <h1>{{ event.title }}</h1>
+    </div>
+       <!-- Date and Time -->
+    <div class="event-datetime">
+      <div class="date-section">
+        {% assign date_format = block.settings.date_format | default: "%d de %B de %Y, %A" %}
+        {% assign time_format = block.settings.time_format | default: "%l:%M %P" %}
+        <span class="date-main">{{ attendee.event_start_at | date: date_format }}</span>
+        <span class="date-divider">&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;</span>
+        <span class="time-main">{{ attendee.event_start_at | date: time_format }} - {{ attendee.event_end_at | date: time_format }}</span>
+      </div>
+    </div>
+</div>
+    <!-- Event Description -->
+    <div class="event-description">
+      <p>{{ block.settings.event_description }}</p>
+    </div>
+    <!-- Ticket Information Box -->
+    <div class="info-box">
+      <!-- QR Code Section -->
+      <div class="qr-section">
+        {% if block.settings.custom_qr_image %}
+          <img src="{{ block.settings.custom_qr_image }}" alt="Ticket QR Code" class="qr-code-image" />
+        {% else %}
+          <img src="data:image/png;base64,{{ qr_data }}" alt="Ticket QR Code" class="qr-code-image" />
+        {% endif %}
+         <div class="ticket-number">
+          <span class="info-value">{{ attendee.ticket_code }}</span>
+        </div>
+      </div>
+      <!-- Ticket Details -->
+      <div class="info-grid">
+        <div class="info-card">
+          <span class="info-label">Nombre del asistente</span>
+          <span class="info-value">{{ attendee.name }}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Boleto</span>
+          <span class="info-value">{{ attendee.ticket.title }}</span>
+        </div>
+        <div class="info-card info-card-full">
+          <span class="info-label">Evento</span>
+          <span class="info-value">{{ event.title }}</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Fecha / Hora</span>
+          <span class="info-value">{{ attendee.event_start_at | date: "%d de %B de %Y" }} | {{ attendee.event_start_at | date: "%l:%M %P" }} - {{ attendee.event_end_at | date: "%l:%M %P" }}</span>
+        </div>
+        <div class="info-card info-card-full">
+          <span class="info-label">Lugar</span>
+          <span class="info-value">{{ attendee.event_location_name }}</span>
+        </div>
+      </div>
+    </div>
+    <!-- Venue Information -->
+    <div class="venue-info">
+      {% if block.settings.venue_line1 %}
+       <p class="venue-name">{{ block.settings.venue_line1 }}</p>
+      {% endif %}
+      {% if block.settings.venue_line2 %}
+        <p class="venue-name">{{ block.settings.venue_line2 }}</p>
+      {% endif %}
+      {% if block.settings.venue_address %}
+        <p class="venue-address">{{ block.settings.venue_address }}</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Numerana Ticket",
+  "type": "numerana-ticket",
+  "max_blocks": 0,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "id": "padding_top",
+      "type": "number",
+      "default": "0.5",
+      "label": "Top padding",
+      "suffix": "inches"
+    },
+    {
+      "id": "padding_bottom",
+      "type": "number",
+      "default": "0.5",
+      "label": "Bottom padding",
+      "suffix": "inches"
+    },
+    {
+      "id": "padding_horizontal",
+      "type": "number",
+      "default": "0.2",
+      "label": "Horizontal padding",
+      "suffix": "inches"
+    },
+    {
+      "type": "header",
+      "content": "Background Image"
+    },
+    {
+      "type": "paragraph",
+      "content": "Upload your background image below. To add the background: 1) Upload the image file, 2) Save settings. The orange geometric background will display behind the white ticket card."
+    },
+    {
+      "type": "image",
+      "id": "background_image",
+      "label": "Background image",
+      "info": "Upload the orange geometric background image for the ticket",
+      "max_width": 2000,
+      "max_height": 2000
+    },
+    {
+      "type": "header",
+      "content": "Event Content"
+    },
+    {
+      "id": "event_description",
+      "type": "textarea",
+      "label": "Event description",
+      "default": "Vive el Encuentro Anual de Números, Espiritualidad y Consciencia en Ciudad de México. Un día para sanar, elevar la energía y reconectar con nuestra Divinidad interior."
+    },
+    {
+      "id": "date_format",
+      "type": "text",
+      "label": "Date format",
+      "default": "%d de %B de %Y, %A",
+      "info": "Liquid date format string (e.g., %d de %B de %Y, %A)"
+    },
+    {
+      "id": "time_format",
+      "type": "text",
+      "label": "Time format",
+      "default": "%l:%M %P",
+      "info": "Liquid time format string"
+    },
+    {
+      "type": "header",
+      "content": "QR Code"
+    },
+    {
+      "type": "image",
+      "id": "custom_qr_image",
+      "label": "Custom QR image",
+      "info": "Optional: Replace dynamic QR code with a custom image",
+      "max_width": 500,
+      "max_height": 500
+    },
+    {
+      "type": "header",
+      "content": "Venue Information"
+    },
+    {
+      "id": "venue_line1",
+      "type": "text",
+      "label": "Venue line 1",
+      "default": "Auditoria El Cantoral, Puente Xoco, s/n-Puerta A. Xoco,"
+    },
+    {
+      "id": "venue_line2",
+      "type": "text",
+      "label": "Venue line 2",
+      "default": "Bonito Juarez,"
+    },
+    {
+      "id": "venue_address",
+      "type": "text",
+      "label": "Venue address",
+      "default": "03330 Ciudad de Mexico, CDMX"
+    }
+  ],
+  "strings": []
+}
+{% endschema %}
+{% endinline %}
