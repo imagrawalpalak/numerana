@@ -1,0 +1,294 @@
+  {% capture email_title %}{{ "events.notifications.ticket_email_title" | t }}{% endcapture %}
+  {% capture first_name %}{{ attendee.first_name | default: 'there' }}{% endcapture %}
+  {% capture email_body %}
+  {% if attendee.transferred_from %}
+    {{ "events.notifications.ticket_email_transferred" | t: first_name: first_name, event_title: event.title, transfer_email: attendee.transferred_from.email }}
+  {% else %}
+    {{ "events.notifications.ticket_email_message" | t: first_name: first_name, event_title: event.title }}
+  {% endif %}
+  {%- if attendee.event_location_type == 'online' and event.virtual_event_page_enabled and event.virtual_event_requires_password and event.virtual_event_show_password -%}
+  {{ "events.notifications.ticket_email_access_code" | t: access_code: attendee.access_code }}
+  {%- endif -%}
+  {% endcapture %}
+  {% capture view_ticket_button_text %}
+    {{ "events.notifications.ticket_email_view_ticket" | t }}
+  {% endcapture %}
+  {% capture footer_text %}
+    {{ "events.notifications.email_footer" | t: contact_email: event.contact_email }}
+  {% endcapture %}
+  {% capture add_to_calendar_label %}
+    {{ "events.notifications.ticket_email_add_to_calendar" | t }}
+  {% endcapture %}
+  {% capture event_details_es %}
+  <p>Bendiciones. ¡Te damos la bienvenida a la primera edición del Encuentro Anual de Números, Espiritualidad y Consciencia!</p>
+  <p>Adjunto encontrarás tu(s) boleto(s).</p>
+  <!-- Single -->
+  <!-- <a href="{{ attendee.ticket_url }}" style='font-size: 16px; text-decoration: none; color: #FFFFFF; padding: 20px 25px; margin-top: 15px; margin-bottom: 15px;background-color: #0e2c70;display: inline-block;border-radius: 10px;'>
+    {{ view_ticket_button_text }}
+  </a> -->
+  <!-- Multiple -->
+  {% for attendee in attendees %}
+  <a href="{{ attendee.ticket_url }}" target='_blank' style='font-size: 16px; text-decoration: none; color: #FFFFFF; padding: 20px 25px; margin-top: 15px; margin-bottom: 15px;background-color: #0e2c70;display: inline-block;border-radius: 10px;'>
+    {{ attendee.ticket.title }}
+    <span style='color:#FFFFFF;font-size:16px; font-weight: bold;'>
+      {{ attendee.ticket_code }}
+    </span>
+    <svg style="height:16px;" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M11 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 11-2 0V6.414l-5.293 5.293a1 1 0 01-1.414-1.414L13.586 5H12a1 1 0 01-1-1zM3 6.5A1.5 1.5 0 014.5 5H8a1 1 0 010 2H5v8h8v-3a1 1 0 112 0v3.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 013 15.5v-9z" fill="{{ block.settings.ticket_title_font_color }}"/></svg>
+  </a>
+  {%endfor %}
+  <p>Prepárate para 10 horas de conferencias, prácticas y herramientas para elevarnos en el camino espiritual.</p>
+  <p>El encuentro será guiado por cinco ponentes, que nos compartirán joyas de diferentes disciplinas para expandir nuestra conciencia.</p>
+  <p>A continuación, te compartimos información general para tu conocimiento y mejorar tu experiencia en el Encuentro.</p>
+  <p><strong>REGISTRO:</strong> de 9:00 a 9:30 am</p>
+  <ul>
+    <li>Puedes imprimir o tener a la mano tu boleto para mostrarlo en el acceso del recinto y te permitan el ingeso. Recomendamos llegar temprano, ya que las butacas se asignarán en el orden de arribo.</li>
+  </ul>
+  <p><strong>¿QUÉ LLEVAR?</strong></p>
+  <ul>
+    <li>Ropa cómoda</li>
+    <li>Botella de agua o termo para rellenar</li>
+    <li>Libreta y bolígrafo</li>
+    <li>Corazón y mente abierta</li>
+  </ul>
+  <p><strong>UBICACIÓN</strong><br>
+  <a href="https://maps.app.goo.gl/Tx1y6ESFyGp7dwjr9?g_st=iw">https://maps.app.goo.gl/Tx1y6ESFyGp7dwjr9?g_st=iw</a></p>
+  <p><strong>¿CÓMO LLEGAR?</strong></p>
+  <ul>
+    <li><strong>AUTO:</strong> Pago de estacionamiento con plazas limitadas. Costo: $150</li>
+    <li><strong>METRO:</strong> La estación más cercana es COYOACÁN.</li>
+  </ul>
+  <p><strong>ALIMENTOS</strong><br>
+  Tu boleto incluye acceso a la barra de hidratación donde tendremos aguas y frutas disponibles durante el evento.<br>
+  Para el almuerzo, contaremos con un tiempo libre de 90 minutos, te invitamos a consumir alimentos vegetarianos. Puedes adquirir un menú en la cafeteria del recinto, traer tu propia comida o salir a comer a las opciones aledañas de la zona.</p>
+  <p><strong>AGENDA</strong><br>
+  A continuación te compartimos la agenda de nuestro Encuentro:
+  <table style="width:100%;border-collapse:collapse;font-family:'Times New Roman',Times,serif;font-size:16px;">
+    <thead>
+      <tr>
+        <th style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;background-color:#0F2C70;text-align:center;font-weight:bold;color:white;">Hora</th>
+        <th style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;background-color:#0F2C70;text-align:center;font-weight:bold;color:white;">Evento</th>
+        <th style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;background-color:#0F2C70;text-align:center;font-weight:bold;color:white;">Guía</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">9:00</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Abren Puertas</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">10:00-10:15</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Bienvenida y Conexión Inicial</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Ana Dorotea</td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">10:15 - 11:00</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"><b>Ponencia 1</b></td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Gerardo Chávez.<br><b><span class="conf-title">Conferencia: “Recuperar el camino del alma, una vía para el despertar Espiritual.”</span></b></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">11:00 - 11:30</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Receso</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">11:30</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Presentación Ponente 2</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">11:35 - 12:20</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"><b>Ponencia 2</b></td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Laura Rodríguez.<br><b><span class="conf-title">Conferencia: Numerología del Tiempo, el vínculo entre tu Ser y el Cosmos.</span></b></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">12:20 - 12:50</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Receso</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">12:50</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Presentación Ponente 3</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">12:55 - 1:40</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"><b>Ponencia 3</b></td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"><br>Sun O’ Yahweh.<br><b><span class="conf-title">Conferencia: Sanar con Meditación Científica</span></b></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">1:40 - 3:00</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Receso / Almuerzo</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">3:00</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Presentación Ponente 4</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">3:05 - 3:50</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"><b>Ponencia 4</b></td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"><br>Angelica Álvarez.<br><b><span class="conf-title">Conferencia: Descifra tus Números y descifra tu verdad</span></b></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">3:50 - 4:20</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Receso</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">4:20</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Presentación Ponente 5</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">4:25 - 5:05</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"><b>Ponencia 5</b><br>Ana Dorotea.<br><span class="conf-title">Conferencia: Números de Grabovoi</span></td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Ana Dorotea.<br><b><span class="conf-title">Conferencia: Números de Grabovoi</span></b></td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">5:05 - 5:20</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Conexión de Cierre</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Ana Dorotea</td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">5:40 - 7:00</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Firma de Libros</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Lobby</td>
+      </tr>
+      <tr>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">7:20</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;">Cierran Puertas</td>
+        <td style="border:1px solid rgba(0, 46, 106, 1);padding:8px 12px;"></td>
+      </tr>
+    </tbody>
+  </table>
+  <p><strong>EXTRAS</strong><br>
+    Contaremos con un Bazar Holístico, donde estarán a la venta libros, herramientas Grabovoi y más productos útiles para apoyarnos en el camino espiritual.</p>
+  <p>Asimismo, ofreceremos consultas de Numerología Express uno a uno, con costo adicional y cupo limitado.</p>
+  <p>Gracias por tu participación, confiamos en que será un encuentro muy bendecido.</p>
+  <p>Con amor y en servicio a la Luz,<br>
+  Equipo del Encuentro Anual de Números, Espiritualidad y Consciencia<br>
+  11981</p>
+  {% endcapture %}
+  {% assign font_family = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;' %}
+  <!DOCTYPE html>
+  <html lang="es">
+    <head>
+      <title>{{ email_title }}</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <style>
+        a {
+          font-size: 14px;
+          text-decoration: none;
+          color: {{ config.accent_color | default: '#1990C6' }};
+        }
+      </style>
+    </head>
+    <body style="background-color: #FFE5C9;">
+      <table style='position:relative; height: 100% !important; width: 100% !important;  max-width:560px; border-spacing: 0; border-collapse: collapse; margin: 0 auto; box-sizing:border-box;' align='center'>
+        <tr>
+          <td style='font-family: {{ font_family }};color:{{ settings.font_color }};font-size:{{ settings.font_size }}px;'>
+            <!-- Header Block -->
+            <table style='width:100%;text-align:left;border-spacing:0;border-collapse:collapse;margin:40px 0 20px;'>
+              <tr>
+                <td style='font-family: {{ font_family }}'>
+                  <table style='width: 100%; border-spacing: 0; border-collapse: collapse; margin-top:10px;'>
+                    <tr>
+                      <td style='font-family: {{ font_family }};width:100%;'>
+                        <h1 style='font-weight: normal; font-size: 30px; color: #333333; margin: 0;'>
+                          <a href="{{ event.event_url }}" style='font-size: 30px; line-height:1.2em; color: #333333; text-decoration: none;'>
+                            {{ event.title }}
+                          </a>
+                        </h1>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+            <!-- Subheading -->
+            <table style='width:100%; border-spacing:0; border-collapse:collapse; margin-top:0px; margin-bottom:10px;'>
+              <tr>
+                <td style='font-family:{{ font_family }};font-size:24px;color:#000000;padding-bottom:0px;'>
+                  <h2 style="font-weight: normal; font-size:24px; color: #000000; margin:0">{{ email_title }}</h2>
+                </td>
+              </tr>
+            </table>
+            <!-- Main Message -->
+            <table style='width:100%; border-spacing:0; border-collapse:collapse; margin: 0 0 20px;'>
+              <tr>
+                <td style='font-family:{{ font_family }};color:{{ settings.font_color }};font-size:{{ settings.font_size }}px;'>
+                  <p style='color:{{ settings.font_color }}; line-height: 150%; font-size: {{ settings.font_size }}px; margin: 0;'>
+                    {{ email_body }}
+                  </p>
+                </td>
+              </tr>
+            </table>
+            <!-- Event Details in Spanish -->
+            <table style='width:100%; border-spacing:0; border-collapse:collapse; margin: 0 0 20px;'>
+              <tr>
+                <td style='font-family:{{ font_family }};color:{{ settings.font_color }};font-size:{{ settings.font_size }}px;'>
+                  {{ event_details_es }}
+                </td>
+              </tr>
+            </table>
+            <!-- Ticket CTA Block 
+            <table style='width:100%; border-spacing:0; border-collapse:collapse; margin-top:27px; margin-bottom:0px;'>
+              <tr>
+                <td style='font-family: {{ font_family }};'>
+                  <table style='border-spacing:0; border-collapse:collapse;'>
+                    <tr>
+                      <td style='font-family: {{ font_family }}; border-radius: 4px; color: #FFFFFF;' align="center" bgcolor="{{ config.accent_color | default: '#1990C6' }}">
+                        <a href="{{ attendee.ticket_url }}" style='font-size: 16px; text-decoration: none; display: block; color: #FFFFFF; padding: 20px 25px;'>
+                          {{ view_ticket_button_text }}
+                        </a>
+                      </td>
+                      {% if event.location_type == "online" and attendee.show_virtual_event_url and attendee.virtual_event_url %}
+                      <td>
+                        &nbsp;&nbsp;
+                        <span style="color: #777; line-height: 150%; font-size: 16px; margin: 0;">o</span>
+                        &nbsp;
+                        <a href="{{ attendee.virtual_event_url }}" style="font-size: 16px; text-decoration: none; color:{{ config.accent_color | default: '#1990C6' }};">Visita la página del evento</a>
+                      </td>
+                      {% endif %}
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>-->
+            <!-- Calendar Options Block -->
+            {% if event.has_calendar_options and attendee.event_start_at_date %}
+            <table style='width:100%; border-spacing:0; border-collapse:collapse; margin-top:30px; margin-bottom:0px;'>
+              <tr>
+                <td style='font-family:{{ font_family }};color:#777777;font-size:16px;'>
+                  <h3 style='font-family: {{ font_family }}; font-weight: bold; font-size: 16px; margin: 0 0 10px; color: #777777;'>
+                    {{ add_to_calendar_label }}
+                  </h3>
+                  <p>
+                    <a href="{{ attendee.add_to_calendar_google_url }}" target='_blank' style='font-family: {{ font_family }}; font-size: 14px; line-height:16px; text-decoration-line: underline;'>Google</a>
+                    &nbsp; | &nbsp;
+                    <a href="{{ attendee.add_to_calendar_outlook_url }}" target='_blank' style='font-family: {{ font_family }}; font-size: 14px; line-height:16px; text-decoration-line: underline;'>Outlook</a>
+                    &nbsp; | &nbsp;
+                    <a href="{{ attendee.add_to_calendar_ics_url }}" target='_blank' style='font-family: {{ font_family }}; font-size: 14px; line-height:16px; text-decoration-line: underline;'>Otros calendarios</a>
+                  </p>
+                </td>
+              </tr>
+            </table>
+            {% endif %}
+            <!-- Footer Block -->
+            <table style='width:100%; border-spacing:0; border-collapse:collapse; margin-top:30px; margin-bottom:20px;'>
+              <tr>
+                <td style='font-family:{{ font_family }};color:#999999;font-size:14px;' align="left">
+                  <p style='color:#999999; line-height: 150%; font-size: 14px; margin: 0;'>
+                    {{ footer_text }}
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
