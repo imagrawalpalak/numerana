@@ -1,0 +1,1550 @@
+{% assign font_family = 'Cambon, serif' %}
+{% assign font_family_fields = 'Causten, sans-serif' %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>{{ event.title }} - {{ "events.general.ticket" | t }} {{ attendee.ticket_code }}</title>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter|Roboto">
+      <link rel="stylesheet" href="https://use.typekit.net/ypm1mrv.css">
+      <style>
+        body {
+          width:100%;
+          height:100%;
+          background-image: url('https://cdn.shopify.com/s/files/1/0617/5024/7497/files/Landing_Page.jpg?v=1761674517');
+          background-size: cover; 
+          background-position: center;
+          background-repeat: no-repeat;
+          font-family: {{ font_family }};
+          margin:0;
+          padding:0;
+          color:#44444F;
+        }
+        a:link {
+          color:#0062FF;
+        }
+        .content {
+          margin: 25px auto 0 auto;
+          max-width: 1250px;
+          box-sizing:border-box;;
+        }
+        .button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-decoration: none;
+          border-radius: 8px;
+          background-color: #0F2C70;
+          height: 48px;
+          min-width:300px;
+          border:0;
+          font-family:'Causten', sans-serif;
+          font-size:28px;
+          font-weight:600;
+          text-transform: uppercase;
+          line-height:16px;
+          color:#FFFFFF;
+          cursor:pointer;
+          padding: 0 20px;
+          box-sizing: border-box;
+        }
+        .button.button-secondary {
+          background-color:#000000;
+        }
+        @media (max-width: 800px) {
+          .content {
+            width:99%;
+            padding: 0 10px;
+          }
+          body {
+            background-image: url('https://cdn.shopify.com/s/files/1/0617/5024/7497/files/Frame_3.png?v=1761674768'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          body::-webkit-scrollbar {
+            display: none;
+          }
+        }
+      </style>
+  </head>
+  <body>
+      {% render_block 'header' %}
+      <div class='content'>
+        {% for block in blocks %}
+          {% render_block block.name %}
+        {% endfor %}
+      </div>
+      <script evey>
+        window.history.replaceState({}, document.title, "{{ attendee.ticket_url }}");
+      </script>
+  </body>
+</html>
+{% schema %}
+{
+  "name": "Ticket page",
+  "type": "template",
+  "blocks": [
+    "event-info",
+    "ticket-info",
+    "notes"
+  ],
+  "settings": [
+    {
+      "id": "background_color",
+      "type": "color",
+      "default": "#FAFAFB",
+      "info": "Page background color"
+    }
+  ]
+}
+{% endschema %}
+{% inline 'blocks/header' %}
+<style>
+  .topbar {
+    background-color: {{ block.settings.background_color }};
+    width: 25%;
+    min-height: 125px;
+    border-bottom-left-radius: 0 20px;
+    border-bottom-right-radius: 0 20px;
+    border-bottom-left-radius: 95% 450px;
+    border-bottom-right-radius: 95% 450px;
+    padding: 0 0 32px 0;
+    box-sizing: border-box;
+    color:{{ block.settings.font_color }};
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+     margin: 0 auto;
+  }
+  @media (max-width: 600px) {
+  .topbar {
+    width: 100%;
+    min-height: 120px;
+    padding: 0 8px 24px 8px;
+    border-bottom-left-radius: 75% 300px;
+    border-bottom-right-radius: 75% 300px;
+  }
+}
+  .topbar .topbar-image {
+    width:100%;
+    display:flex;
+    padding-top:15px;
+    justify-content: {{ block.settings['logo-alignment'] | default: "center" }};
+    align-items: center;
+  }
+  .topbar .topbar-image img {
+    box-sizing: border-box;
+    max-height:185px;
+    {% if block.settings['logo-padding-top'] != nil and block.settings['logo-padding-top'] != '' %}padding-top:{{ block.settings['logo-padding-top'] }}px;{% endif %}
+    {% if block.settings['logo-padding-bottom'] != nil and block.settings['logo-padding-bottom'] != '' %}padding-bottom:{{ block.settings['logo-padding-bottom'] }}px;{% endif %}
+  }
+  .topbar-links {
+    position:absolute;
+    right:20px;
+    top:0;
+    height:100%;
+    display:flex;
+    align-items:center;
+  }
+  .contact-organizer {
+    color:{{ block.settings.font_color }};
+    font-family: {{ font_family }};
+    font-size:14px;
+    line-height:32px;
+    font-weight:400;
+    text-decoration:none;
+  }
+  .topbar a:link {
+    color:{{ block.settings.font_color }};
+  }
+</style>
+<div class="topbar">
+  <div class='topbar-image'>
+    {% if block.settings.logo %}<img src="{{ block.settings.logo }}" />{% endif %}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Header",
+  "type": "header",
+  "max_blocks": 0,
+  "settings": [
+    {
+      "type": "image",
+      "id": "logo",
+      "label": "Logo image",
+      "default": "https://evey-files.s3.amazonaws.com/images/evey-logo-white.svg"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "default": "#3C3AB1",
+      "label": "Background color"
+    },
+    {
+      "type": "color",
+      "id": "font_color",
+      "default": "#FFFFFF",
+      "label": "Text color"
+    },
+    {
+      "type": "header",
+      "content": "Style settings"
+    },
+    {
+      "id": "logo-alignment",
+      "type": "select",
+      "default": "center",
+      "label": "Logo alignment",
+      "options": [
+        { "label": "Left", "value": "left" },
+        { "label": "Center", "value": "center" }
+      ]
+    },
+    {
+      "id": "logo-padding-top",
+      "type": "number",
+      "default": "10",
+      "label": "Logo top padding",
+      "suffix": "px"
+    },
+    {
+      "id": "logo-padding-bottom",
+      "type": "number",
+      "default": "10",
+      "label": "Logo bottom padding",
+      "suffix": "px"
+    }
+  ],
+  "strings": [
+    {
+      "id": "events.ticket_page.contact_organizer",
+      "default": "Contact"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/event-info' %}
+<style>
+  .event-info {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    text-align: center;
+    {% if block.settings['padding-top'] != nil and block.settings['padding-top'] != '' %}padding-top:{{ block.settings['padding-top'] }}px;{% endif %}
+    {% if block.settings['padding-bottom'] != nil and block.settings['padding-bottom'] != '' %}padding-bottom:{{ block.settings['padding-bottom'] }}px;{% endif %}
+    color: {{ block.settings.font_color }};
+    font-weight: 500;
+    font-size: 22px;
+    line-height:20px;
+    }
+  .event-info a:link {
+    color: {{ block.settings.font_color }};
+    line-height: 1.2;
+    text-decoration: none;
+  }
+  .event-info>div {
+    padding-right: 20px;
+    padding-left: 20px;
+    flex:1;
+  }
+  .event-info .label {
+    font-size:20px;
+    line-height:18px;
+    margin-bottom:10px;
+    color: {{ block.settings.label_color }};
+    font-weight:bold;
+  }
+  @media (max-width: 800px) {
+    .event-info {
+      flex-direction: column;
+      text-align:center;
+      line-height:26px;
+      text-decoration:none;
+    }
+    .event-info>div {
+      width: 90%;
+      margin: 17px 29px 0 0;
+    }
+  }
+</style>
+<div class="event-info">
+  {% for block in blocks %}
+    {% if block.name == 'event-info-date' %}
+      {% if attendee.event_start_at_date %}
+        {% render_block block.name %}
+      {% endif %}
+    {% elsif block.name == 'event-info-location' %}
+      {% if attendee.event_has_location %}
+        {% render_block block.name %}
+      {% endif %}
+    {% else %}
+      {% render_block block.name %}
+    {% endif %}
+  {% endfor %}
+</div>
+{% schema %}
+{
+  "name": "Event Info",
+  "type": "event-info",
+  "blocks": ["event-info-title", "event-info-date", "event-info-location"],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Style settings"
+    },
+    {
+      "id": "label_color",
+      "type": "color",
+      "default": "#44444F",
+      "label": "Label color"
+    },
+    {
+      "id": "font_color",
+      "type": "color",
+      "default": "#171725",
+      "label": "Text color"
+    },
+    {
+      "id": "padding-top",
+      "type": "number",
+      "default": "20",
+      "label": "Top padding",
+      "suffix": "px"
+    },
+    {
+      "id": "padding-bottom",
+      "type": "number",
+      "default": "20",
+      "label": "Bottom padding",
+      "suffix": "px"
+    }
+  ],
+  "strings": []
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/event-info-title' %}
+<div>
+  <div class="label"> 
+    <svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 42 42" fill="none">
+      <g clip-path="url(#clip0_2681_106)">
+      <path d="M21.001 41.95C18.173 41.95 15.4295 41.396 12.8459 40.3035C10.3509 39.2485 8.11088 37.7379 6.18685 35.8139C4.26283 33.8899 2.75231 31.6499 1.6973 29.1548C0.604788 26.5718 0.0507812 23.8283 0.0507812 21.0002C0.0507812 18.1722 0.604788 15.4287 1.6973 12.8451C2.75231 10.3501 4.26283 8.11008 6.18685 6.18606C8.11088 4.26204 10.3509 2.75152 12.8459 1.69651C15.429 0.603994 18.173 0.0499878 21.001 0.0499878C23.8291 0.0499878 26.5726 0.603994 29.1561 1.69651C31.6512 2.75152 33.8912 4.26204 35.8152 6.18606C37.7392 8.11008 39.2497 10.3501 40.3048 12.8451C41.3973 15.4282 41.9513 18.1722 41.9513 21.0002C41.9513 23.8283 41.3973 26.5718 40.3048 29.1553C39.2497 31.6504 37.7392 33.8904 35.8152 35.8144C33.8912 37.7384 31.6512 39.249 29.1561 40.304C26.5731 41.3965 23.8291 41.9505 21.001 41.9505V41.95ZM21.001 1.198C18.3275 1.198 15.7345 1.72151 13.2934 2.75402C10.9354 3.75153 8.81789 5.17905 6.99886 6.99807C5.17984 8.81709 3.75233 10.9346 2.75481 13.2926C1.7223 15.7337 1.19879 18.3267 1.19879 21.0002C1.19879 23.6738 1.7223 26.2668 2.75481 28.7078C3.75233 31.0659 5.17984 33.1834 6.99886 35.0024C8.81789 36.8214 10.9354 38.2489 13.2934 39.2465C15.7345 40.279 18.3275 40.8025 21.001 40.8025C23.6746 40.8025 26.2676 40.279 28.7086 39.2465C31.0667 38.2489 33.1842 36.8214 35.0032 35.0024C36.8222 33.1834 38.2497 31.0659 39.2472 28.7078C40.2798 26.2668 40.8033 23.6738 40.8033 21.0002C40.8033 18.3267 40.2798 15.7337 39.2472 13.2926C38.2497 10.9346 36.8222 8.81709 35.0032 6.99807C33.1842 5.17905 31.0667 3.75153 28.7086 2.75402C26.2676 1.72151 23.6746 1.198 21.001 1.198Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M21.5653 20.0643C21.5683 20.0593 21.5713 20.0543 21.5738 20.0488V9.28012C21.5738 8.96312 21.3168 8.70612 20.9998 8.70612C20.6828 8.70612 20.4258 8.96312 20.4258 9.28012V20.1668C20.7978 20.0933 21.1858 20.0683 21.5648 20.0638L21.5653 20.0643Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M21.4945 19.8607C21.4905 19.8577 21.4865 19.8547 21.4825 19.8522H13.0954C12.8484 19.8522 12.6484 20.1092 12.6484 20.4262C12.6484 20.7432 12.8484 21.0002 13.0954 21.0002H21.575C21.518 20.6282 21.4985 20.2402 21.495 19.8612L21.4945 19.8607Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M21.0002 6.07208C21.5224 6.07208 21.9457 5.64876 21.9457 5.12657C21.9457 4.60438 21.5224 4.18106 21.0002 4.18106C20.478 4.18106 20.0547 4.60438 20.0547 5.12657C20.0547 5.64876 20.478 6.07208 21.0002 6.07208Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M9.77559 10.7211C10.2978 10.7211 10.7211 10.2978 10.7211 9.77562C10.7211 9.25343 10.2978 8.83011 9.77559 8.83011C9.2534 8.83011 8.83008 9.25343 8.83008 9.77562C8.83008 10.2978 9.2534 10.7211 9.77559 10.7211Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M9.77559 33.1699C10.2978 33.1699 10.7211 32.7466 10.7211 32.2244C10.7211 31.7022 10.2978 31.2789 9.77559 31.2789C9.2534 31.2789 8.83008 31.7022 8.83008 32.2244C8.83008 32.7466 9.2534 33.1699 9.77559 33.1699Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M32.2248 33.1699C32.747 33.1699 33.1703 32.7466 33.1703 32.2244C33.1703 31.7022 32.747 31.2789 32.2248 31.2789C31.7026 31.2789 31.2793 31.7022 31.2793 32.2244C31.2793 32.7466 31.7026 33.1699 32.2248 33.1699Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M32.2248 10.7211C32.747 10.7211 33.1703 10.2978 33.1703 9.77562C33.1703 9.25343 32.747 8.83011 32.2248 8.83011C31.7026 8.83011 31.2793 9.25343 31.2793 9.77562C31.2793 10.2978 31.7026 10.7211 32.2248 10.7211Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M5.12715 21.9458C5.64934 21.9458 6.07266 21.5225 6.07266 21.0003C6.07266 20.4781 5.64934 20.0547 5.12715 20.0547C4.60496 20.0547 4.18164 20.4781 4.18164 21.0003C4.18164 21.5225 4.60496 21.9458 5.12715 21.9458Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M21.0002 37.8189C21.5224 37.8189 21.9457 37.3956 21.9457 36.8734C21.9457 36.3512 21.5224 35.9279 21.0002 35.9279C20.478 35.9279 20.0547 36.3512 20.0547 36.8734C20.0547 37.3956 20.478 37.8189 21.0002 37.8189Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M36.8732 21.9458C37.3954 21.9458 37.8188 21.5225 37.8188 21.0003C37.8188 20.4781 37.3954 20.0547 36.8732 20.0547C36.3511 20.0547 35.9277 20.4781 35.9277 21.0003C35.9277 21.5225 36.3511 21.9458 36.8732 21.9458Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      <path d="M20.9995 21.3613C21.5159 21.3613 21.9345 20.9426 21.9345 20.4263C21.9345 19.9099 21.5159 19.4912 20.9995 19.4912C20.4831 19.4912 20.0645 19.9099 20.0645 20.4263C20.0645 20.9426 20.4831 21.3613 20.9995 21.3613Z" fill="#0F2C70" stroke="#0F2C70" stroke-width="2" stroke-miterlimit="10"/>
+      </g>
+      <defs>
+      <clipPath id="clip0_2681_106">
+      <rect width="42" height="42" fill="white"/>
+      </clipPath>
+      </defs>
+    </svg>
+  </div>
+  <div class="event-info-title">
+    {% assign start_time = attendee.event_start_at | date: "%-I:%M %P" %}
+    {% assign end_time = attendee.event_end_at | date: "%-I:%M %P" %}
+    {{ start_time | replace: "am", "a. m." | replace: "pm", "p. m." }} – {{ end_time | replace: "am", "a. m." | replace: "pm", "p. m." }}
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Title",
+  "type": "event-info-title",
+  "max_blocks": 0,
+  "strings": [
+    {
+      "id": "events.general.event",
+      "default": "Event"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/event-info-date' %}
+{% if attendee.event_start_at_date %}
+  <div>
+    <div class="label">
+      <svg width="40" height="43" viewBox="0 0 40 43" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="6" width="36" height="35" rx="6" stroke="#183163" stroke-width="2"/>
+      <line x1="2" y1="14" x2="38" y2="14" stroke="#183163" stroke-width="2"/>
+      <rect x="10" y="18" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="17" y="18" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="24" y="18" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="31" y="18" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="10" y="25" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="17" y="25" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="24" y="25" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="31" y="25" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="10" y="32" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="17" y="32" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="24" y="32" width="3" height="3" rx="1.5" fill="#183163"/>
+      <rect x="31" y="32" width="3" height="3" rx="1.5" fill="#183163"/></svg>
+    </div>
+    <!-- <div class="label">{{ "events.general.time" | t }}</div> -->
+    <div class="event-info-date">
+      {{ attendee.event_start_at | date: "%-d de %B de %Y %A" }}
+    </div>
+  </div>
+{% endif %}
+{% schema %}
+{
+  "name": "Date",
+  "type": "event-info-date",
+  "max_blocks": 0,
+  "strings": [
+    {
+      "id": "events.general.time",
+      "default": "Time"
+    },
+    {
+      "id": "events.ticket_page.date_format",
+      "default": "%B %e, %Y"
+    },
+    {
+      "id": "events.ticket_page.time_format",
+      "default": "%l:%M %P"
+    },
+    {
+      "id": "events.general.date_at",
+      "default": "at"
+    },
+    {
+      "id": "events.general.date_to",
+      "default": "to"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/event-info-location' %}
+{% if attendee.event_location_type == 'online' %}
+  <div>
+    <div class="label">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="43" viewBox="0 0 28 43" fill="none">
+      <g clip-path="url(#clip0_2681_102)">
+      <path d="M13.9998 35.2211L3.69204 21.334C1.79305 18.7754 0.863374 15.6001 1.07432 12.392C1.28526 9.18386 2.62259 6.16498 4.83927 3.89156L5.10053 3.6236H5.10866C7.52205 1.28398 10.6648 0 13.9998 0C17.3347 0 20.4775 1.28398 22.8914 3.6236H22.899L23.1608 3.89156C25.3775 6.16498 26.7148 9.18386 26.9257 12.392C27.1367 15.5996 26.207 18.7759 24.308 21.334L14.0003 35.2211H13.9998ZM6.03986 5.24695C4.16425 7.20029 3.0338 9.77763 2.85335 12.515C2.67138 15.2816 3.47297 18.02 5.1107 20.2262L13.9998 32.2017L22.8889 20.2262C24.5266 18.02 25.3282 15.2811 25.1462 12.515C24.9658 9.77451 23.8328 7.19404 21.9531 5.24018L21.8987 5.18492C19.7888 3.02097 16.9835 1.82927 13.9993 1.82927C11.0151 1.82927 8.20978 3.02097 6.09984 5.18492L6.03935 5.24695H6.03986Z" fill="#0F2C70"></path>
+      <path d="M14.0004 17.3533C16.1903 17.3533 17.9656 15.5325 17.9656 13.2866C17.9656 11.0406 16.1903 9.21985 14.0004 9.21985C11.8104 9.21985 10.0352 11.0406 10.0352 13.2866C10.0352 15.5325 11.8104 17.3533 14.0004 17.3533Z" fill="#0F2C70"></path>
+      <path d="M28 35.6089C28 37.7093 26.4573 39.6282 23.6561 41.0123C21.0618 42.2941 17.6328 43 14 43C10.3672 43 6.93824 42.2941 4.3439 41.0123C1.54268 39.6282 0 37.7093 0 35.6089C0 34.1258 0.779218 32.711 2.25378 31.5187C3.41727 30.5778 4.99604 29.7911 6.85183 29.2229L8.03159 30.7837C4.23563 31.7903 1.7831 33.6842 1.7831 35.6084C1.7831 36.9481 2.99895 38.3166 5.11803 39.3644C7.47551 40.5295 10.63 41.1707 14 41.1707C17.37 41.1707 20.5245 40.5295 22.882 39.3644C25.0011 38.3171 26.2169 36.9481 26.2169 35.6084C26.2169 33.6842 23.7644 31.7903 19.9684 30.7837L21.1482 29.2229C23.004 29.7906 24.5827 30.5778 25.7462 31.5187C27.2208 32.711 28 34.1258 28 35.6089Z" fill="#0F2C70"></path>
+      </g>
+      <defs>
+      <clipPath id="clip0_2681_102">
+      <rect width="28" height="43" fill="white"></rect>
+      </clipPath>
+      </defs>
+      </svg>
+    </div>
+    <div class="event-info-location">
+      {% if attendee.show_virtual_event_url and attendee.virtual_event_url %}
+        <a href="{{ attendee.virtual_event_url }}" target="_blank">{{ "events.general.location_online" | t }}</a>
+      {% else %}
+        {{ "events.general.location_online" | t }}
+      {% endif %}
+    </div>
+  </div>
+{% elsif attendee.event_location_type == 'transit' and attendee.event_origin_name and attendee.event_destination_name %}
+  <div>
+    <div class="label">
+      <svg xmlns="http://www.w3.org/2000/svg" width="28" height="43" viewBox="0 0 28 43" fill="none">
+        <g clip-path="url(#clip0_2681_102)">
+        <path d="M13.9998 35.2211L3.69204 21.334C1.79305 18.7754 0.863374 15.6001 1.07432 12.392C1.28526 9.18386 2.62259 6.16498 4.83927 3.89156L5.10053 3.6236H5.10866C7.52205 1.28398 10.6648 0 13.9998 0C17.3347 0 20.4775 1.28398 22.8914 3.6236H22.899L23.1608 3.89156C25.3775 6.16498 26.7148 9.18386 26.9257 12.392C27.1367 15.5996 26.207 18.7759 24.308 21.334L14.0003 35.2211H13.9998ZM6.03986 5.24695C4.16425 7.20029 3.0338 9.77763 2.85335 12.515C2.67138 15.2816 3.47297 18.02 5.1107 20.2262L13.9998 32.2017L22.8889 20.2262C24.5266 18.02 25.3282 15.2811 25.1462 12.515C24.9658 9.77451 23.8328 7.19404 21.9531 5.24018L21.8987 5.18492C19.7888 3.02097 16.9835 1.82927 13.9993 1.82927C11.0151 1.82927 8.20978 3.02097 6.09984 5.18492L6.03935 5.24695H6.03986Z" fill="#0F2C70"></path>
+        <path d="M14.0004 17.3533C16.1903 17.3533 17.9656 15.5325 17.9656 13.2866C17.9656 11.0406 16.1903 9.21985 14.0004 9.21985C11.8104 9.21985 10.0352 11.0406 10.0352 13.2866C10.0352 15.5325 11.8104 17.3533 14.0004 17.3533Z" fill="#0F2C70"></path>
+        <path d="M28 35.6089C28 37.7093 26.4573 39.6282 23.6561 41.0123C21.0618 42.2941 17.6328 43 14 43C10.3672 43 6.93824 42.2941 4.3439 41.0123C1.54268 39.6282 0 37.7093 0 35.6089C0 34.1258 0.779218 32.711 2.25378 31.5187C3.41727 30.5778 4.99604 29.7911 6.85183 29.2229L8.03159 30.7837C4.23563 31.7903 1.7831 33.6842 1.7831 35.6084C1.7831 36.9481 2.99895 38.3166 5.11803 39.3644C7.47551 40.5295 10.63 41.1707 14 41.1707C17.37 41.1707 20.5245 40.5295 22.882 39.3644C25.0011 38.3171 26.2169 36.9481 26.2169 35.6084C26.2169 33.6842 23.7644 31.7903 19.9684 30.7837L21.1482 29.2229C23.004 29.7906 24.5827 30.5778 25.7462 31.5187C27.2208 32.711 28 34.1258 28 35.6089Z" fill="#0F2C70"></path>
+        </g>
+        <defs>
+        <clipPath id="clip0_2681_102">
+        <rect width="28" height="43" fill="white"></rect>
+        </clipPath>
+        </defs>
+      </svg>
+    </div>
+    <div class="event-info-location">
+      {% assign origin_name = attendee.event_origin_name %}
+      {% assign destination_name = attendee.event_destination_name %}
+      {% if attendee.event_origin_code != nil and attendee.event_origin_code != nil %}
+        {% assign origin_name = attendee.event_origin_name | append: " (" | append: attendee.event_origin_code | append: ")" %}
+      {% endif %}
+      {% if attendee.event_destination_code != nil and attendee.event_destination_code != nil %}
+        {% assign destination_name = attendee.event_destination_name | append: " (" | append: attendee.event_destination_code | append: ")" %}
+      {% endif %}
+      {% if attendee.event_origin_url != empty and attendee.event_origin_url != nil %}
+        <a href="{{ attendee.event_origin_url }}" target="_blank">{{ origin_name }}</a> {{ "events.general.date_to" | t }} <a href="{{ attendee.event_destination_url }}" target="_blank">{{ destination_name }}</a>
+      {% else %}
+        {{ origin_name }} {{ "events.general.date_to" | t }} {{ destination_name }}
+      {% endif %}
+    </div>
+  </div>
+{% else %}
+  {% if attendee.event_location_name != empty and attendee.event_location_name != nil %}
+    <div>
+      <div class="label"> <svg xmlns="http://www.w3.org/2000/svg" width="28" height="43" viewBox="0 0 28 43" fill="none">
+        <g clip-path="url(#clip0_2681_102)">
+        <path d="M13.9998 35.2211L3.69204 21.334C1.79305 18.7754 0.863374 15.6001 1.07432 12.392C1.28526 9.18386 2.62259 6.16498 4.83927 3.89156L5.10053 3.6236H5.10866C7.52205 1.28398 10.6648 0 13.9998 0C17.3347 0 20.4775 1.28398 22.8914 3.6236H22.899L23.1608 3.89156C25.3775 6.16498 26.7148 9.18386 26.9257 12.392C27.1367 15.5996 26.207 18.7759 24.308 21.334L14.0003 35.2211H13.9998ZM6.03986 5.24695C4.16425 7.20029 3.0338 9.77763 2.85335 12.515C2.67138 15.2816 3.47297 18.02 5.1107 20.2262L13.9998 32.2017L22.8889 20.2262C24.5266 18.02 25.3282 15.2811 25.1462 12.515C24.9658 9.77451 23.8328 7.19404 21.9531 5.24018L21.8987 5.18492C19.7888 3.02097 16.9835 1.82927 13.9993 1.82927C11.0151 1.82927 8.20978 3.02097 6.09984 5.18492L6.03935 5.24695H6.03986Z" fill="#0F2C70"></path>
+        <path d="M14.0004 17.3533C16.1903 17.3533 17.9656 15.5325 17.9656 13.2866C17.9656 11.0406 16.1903 9.21985 14.0004 9.21985C11.8104 9.21985 10.0352 11.0406 10.0352 13.2866C10.0352 15.5325 11.8104 17.3533 14.0004 17.3533Z" fill="#0F2C70"></path>
+        <path d="M28 35.6089C28 37.7093 26.4573 39.6282 23.6561 41.0123C21.0618 42.2941 17.6328 43 14 43C10.3672 43 6.93824 42.2941 4.3439 41.0123C1.54268 39.6282 0 37.7093 0 35.6089C0 34.1258 0.779218 32.711 2.25378 31.5187C3.41727 30.5778 4.99604 29.7911 6.85183 29.2229L8.03159 30.7837C4.23563 31.7903 1.7831 33.6842 1.7831 35.6084C1.7831 36.9481 2.99895 38.3166 5.11803 39.3644C7.47551 40.5295 10.63 41.1707 14 41.1707C17.37 41.1707 20.5245 40.5295 22.882 39.3644C25.0011 38.3171 26.2169 36.9481 26.2169 35.6084C26.2169 33.6842 23.7644 31.7903 19.9684 30.7837L21.1482 29.2229C23.004 29.7906 24.5827 30.5778 25.7462 31.5187C27.2208 32.711 28 34.1258 28 35.6089Z" fill="#0F2C70"></path>
+        </g>
+        <defs>
+        <clipPath id="clip0_2681_102">
+        <rect width="28" height="43" fill="white"></rect>
+        </clipPath>
+        </defs>
+      </svg></div>
+      <div class="event-info-location">
+        {% if attendee.event_location_url != empty and attendee.event_location_url != nil %}
+          <a href="{{ attendee.event_location_url }}" target="_blank">{{ attendee.event_location_name }}</a>
+        {% else %}
+          {{ attendee.event_location_name }}
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+{% schema %}
+{
+  "name": "Location",
+  "type": "event-info-location",
+  "max_blocks": 0,
+  "strings": [
+    {
+      "id": "events.general.location",
+      "default": "Location"
+    },
+    {
+      "id": "events.general.location_online",
+      "default": "Online"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/ticket-info' %}
+<style>
+  .ticket-info-container {
+    {% if block.settings['padding-top'] != nil and block.settings['padding-top'] != '' %}padding-top:{{ block.settings['padding-top'] }}px;{% endif %}
+    {% if block.settings['padding-bottom'] != nil and block.settings['padding-bottom'] != '' %}padding-bottom:{{ block.settings['padding-bottom'] }}px;{% endif %}
+  }
+  .ticket-info {
+    position:relative;
+    background-color: transparent;
+    border-radius: 8px;
+    padding: 29px 40px;
+    color: {{ block.settings.text_color }};
+  }
+  .form-group label {
+    background-color:{{ block.settings.background_color }};
+  }
+  .form-group.disabled label {
+    background-color:transparent;
+  }
+  .form-group.static-content h4 {
+    color:{{ block.settings.heading_color }};
+  }
+  .ticket-info-cancelled {
+    padding:66px;
+    border-radius:4px;
+    display:flex;
+    justify-content:center;
+    flex-direction:column;
+  }
+  .ticket-info-cancelled-message {
+    font-family: {{ font_family }};
+    font-size:24px;
+    line-height:32px;
+    text-align:center;
+    color:#DC3232;
+  }
+  .ticket-info-transferred-details {
+    font-family: {{ font_family }};
+    font-size:20px;
+    line-height:32px;
+    text-align:center;
+    margin-top:20px;
+  }
+  .ticket-info-content {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content:stretch;
+  }
+  .ticket-info h1 {
+    color: {{ block.settings.heading_color }};
+    font-size:40px;
+    font-weight:500;
+    margin:0;
+    margin-bottom:10px;
+  }
+  #block-container--attendee-form {
+    flex:1;
+    width: 50%;
+  }
+  @media (max-width: 768px) {
+    #block-container--attendee-form {
+      max-width: 90%;
+      margin: auto;
+    }
+    .ticket-info h1{
+      font-size: 30px;
+    }
+  }
+  .attendee-details {
+    padding-right: 20px;
+  }
+  .form-group {
+    position:relative;
+    display:flex;
+    flex-direction: column-reverse;
+    margin-top:25px;
+    border: 1px solid {{ block.settings.input_border_color }};
+    border-radius: 10px;
+  }
+  .form-group.static-content {
+    font-family: {{ font_family }};
+    display:block;
+    border:none;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: 400;
+  }
+  .form-group.static-content h4 {
+    margin-top:16px;
+    margin-bottom:0;
+    font-size:18px;
+  }
+  .form-group:focus-within {
+    outline:none;
+    border: 1px solid {{ block.settings.input_border_color_active }};
+  }
+  .form-group input:focus + label, .form-group select:focus + label {
+    color: {{ block.settings.input_border_color_active }};
+  }
+  .form-group input:placeholder-shown + label {
+    display:none;
+  }
+  .form-group.disabled {
+    background-color:{{ block.settings.input_disabled_background_color }};
+  }
+  .form-group input, .form-group select {
+    width:100%;
+    border:none;
+    background-color:transparent;
+    padding: 16px 20px;
+    color: {{ block.settings.text_color }};
+    font-family: {{ font_family_fields }};
+    font-size:14px;
+    line-height:16px;
+    font-weight:normal;
+  }
+  .form-group select {
+    -moz-appearance:none; /* Firefox */
+    -webkit-appearance:none; /* Safari and Chrome */
+    appearance:none;
+    background: transparent;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 98%;
+    background-position-y: 12px;
+  }
+  .form-group input:focus, .form-group select:focus {
+    outline:none;
+  }
+  .form-group .choicelist {
+    padding:10px;
+  }
+  .form-group .choicelist .choice {
+    display: flex;
+    flex-direction: row;
+    margin-top:5px;
+  }
+  .form-group .choicelist .choice input {
+    width:auto;
+  }
+  .form-group .choicelist .choice span {
+    cursor:default;
+    margin-left:8px;
+  }
+  ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: {{ block.settings.label_color }};
+    opacity: 1; /* Firefox */
+  }
+  :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: {{ block.settings.label_color }};
+  }
+  ::-ms-input-placeholder { /* Microsoft Edge */
+    color: {{ block.settings.label_color }};
+  }
+  .attendee-details button {
+    border-radius: 8px;
+    background-color: {{ block.settings.button_color }};
+    height: 48px;
+    width: 100%;
+    margin: 28px 0 0 0;
+    border:0;
+    font-family: 'Causten', sans-serif;
+    font-size:18px;
+    font-weight:200;
+    line-height:16px;
+    color:{{ block.settings.button_text_color }};
+    cursor:pointer;
+  }
+  .attendee-details button:focus {
+    outline:none;
+  }
+  .ticket-formats {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    /* align-items:center; */
+    padding-left:40px;
+    padding-right:0;
+    padding-bottom:20px;
+  }
+  .ticket-formats .flash-container {
+    max-width:95%;
+    box-sizing:border-box;
+  }
+  .qr-outer-container {
+    background-color:transparent;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:320px;
+  }
+  .qr-inner-container {
+    width:272px;
+    height:272px;
+    background-color:transparent;
+    border-radius: 12px;
+    padding:10px;
+    box-sizing:border-box;;
+    padding-top: 0;
+    padding-left: 0;
+  }
+  .qrcode {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .stub-info {
+    width: 100%;
+    max-width: 352px;
+    font-size: 18px;
+    line-height: 30px;
+    font-weight:400;
+    padding: 0 30px;
+    box-sizing: border-box;
+  }
+  .stub-info a{
+    font-size: 14px;
+  }
+  .issue-date{
+    text-transform: capitalize;
+  }
+  .stub-info strong {
+    text-transform: math-auto;
+    font-weight:700;
+  }
+  .download-options {
+    font-size: 18px;
+    line-height: 30px;
+    font-weight:400;
+    padding: 0 30px;
+    box-sizing: border-box;
+    }
+  .download-options strong {
+    font-weight:700;
+  }
+  .download-options .download-ticket a {
+    line-height:24px;
+    color:#0F2C70;
+  }
+  .add-to-calendar {
+    margin-top:16px;
+    display: flex;
+    flex-direction: column;
+    font-weight:700;
+  }
+  .calendar-options {
+    display:flex;
+  }
+  .calendar-options a {
+    font-weight:400;
+    padding: 0 10px;
+    color:#0F2C70;
+  }
+  .calendar-options a:first-child {
+    padding-left:0;
+  }
+  .calendar-options a:last-child {
+    padding-right:0;
+  }
+  .transfer-notice {
+    font-style: italic;
+    margin-left:24px;
+    width:90%;
+    margin-top:25px;
+    font-size:12px;
+    line-height:16px;
+  }
+  .flash-container {
+    font-size:14px;
+    line-height:16px;
+    background-color: #E9F3FB;
+    border-radius: 4px;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    margin-top:25px;
+  }
+  .flash-container.warning {
+    background-color:#FBF5E8;
+  }
+  .parent-div{
+    display: flex;
+    margin-top: 25px;
+  }
+  .event-info .block-container:not(:last-child) {
+    border-bottom: 1px solid #0F2C70;
+  }
+  @media (min-width: 800px) {
+    .event-info .block-container:not(:last-child) {
+      border-right: 1px solid #0F2C70;
+      border-bottom: 0;
+    }
+    .download-options{
+      padding-left: 0;
+    }
+    .add-to-calendar {
+      flex-direction: row;
+      gap: 20px;
+    }
+  }
+  @media (max-width: 800px) {
+    .parent-div{
+      flex-wrap: wrap;
+    }
+    .download-options, .stub-info {
+      max-width: 320px;
+    }
+    .ticket-info {
+      width:100%;
+      padding:29px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    .ticket-formats {
+      padding-left:10px;
+      padding-right:10px;
+    }
+    .attendee-details {
+      padding-left:10px;
+      padding-right:10px;
+      border:none;
+    }
+    .ticket-info-content {
+      flex-wrap: wrap-reverse;
+    }
+    .ticket-info-cancelled {
+      padding:16px;
+    }
+    .download-options {
+        width: 98%;         
+        font-size: 16px;    
+        padding: 0 10px;    
+    }
+  }
+</style>
+<div class='ticket-info-container' data-block-name="{{ block.name }}">
+<div class="ticket-info">
+  {% if attendee.cancelled? %}
+    <div class="ticket-info-cancelled">
+      <div class="ticket-info-cancelled-message">
+        {% if attendee.transferred_to %}
+          {{ "events.ticket_page.transferred_message" | t }}
+        {% else %}
+          {{ "events.ticket_page.cancelled_message" | t }}
+        {% endif %}
+      </div>
+      {% if attendee.transferred_to %}
+        <div class="ticket-info-transferred-details">
+          <div>{{ "events.ticket_page.transferred_to" | t }}: {{ attendee.transferred_to.phone | default: attendee.transferred_to.email }}</div>
+          <div>{{ "events.ticket_page.transfer_date" | t }}: {{ attendee.transferred_to.created_at | date:"%B %e, %Y" }}</div>
+        </div>
+      {% endif %}
+    </div>
+  {% else %}
+    <h1>{{ "events.ticket_page.ticket_details" | t }}</h1>
+    <div class="ticket-info-content">
+      {% for block in blocks %}
+        {% render_block block.name %}
+      {% endfor %}
+    </div>
+  {% endif %}
+  <script evey>
+    const emailphone = document.getElementById('emailphone');
+    const submitButton = document.getElementById('submit-button');
+    const originalEmail = emailphone.value;
+    emailphone.addEventListener('input', function (e) {
+      if (emailphone.value != originalEmail) {
+        submitButton.innerHTML = "{{ "events.ticket_page.update_transfer" | t }}";
+      } else {
+        submitButton.innerHTML = "{{ "events.ticket_page.update_details" | t }}";
+      }
+    });
+    const form = document.getElementById('details-form');
+    form.addEventListener('submit', function (e) {
+      submitButton.disabled = true;
+    });
+  </script>
+</div>
+</div>
+{% schema %}
+{
+  "name": "Ticket Info",
+  "type": "ticket-info",
+  "max_blocks": 0,
+  "blocks": [
+    "attendee-form",
+    "ticket-formats"
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Style settings"
+    },
+    {
+      "id": "background_color",
+      "type": "color",
+      "default": "#FFFFFF",
+      "label": "Background color"
+    },
+    {
+      "id": "text_color",
+      "type": "color",
+      "default": "#44444F",
+      "label": "Text color"
+    },
+    {
+      "id": "label_color",
+      "type": "color",
+      "default": "#737273",
+      "label": "Label color"
+    },
+    {
+      "id": "input_border_color",
+      "type": "color",
+      "default": "#D9D9DA",
+      "label": "Input border color"
+    },
+    {
+      "id": "input_border_color_active",
+      "type": "color",
+      "default": "#50B5FF",
+      "label": "Focused input border color"
+    },
+    {
+      "id": "button_color",
+      "type": "color",
+      "default": "#0062FF",
+      "label": "Button color"
+    },
+    {
+      "id": "button_text_color",
+      "type": "color",
+      "default": "#FAFAFB",
+      "label": "Button text color"
+    },
+    {
+      "id": "heading_color",
+      "type": "color",
+      "default": "#171725",
+      "label": "Heading text color"
+    },
+    {
+      "id": "padding-top",
+      "type": "number",
+      "default": "25",
+      "label": "Top padding",
+      "suffix": "px"
+    },
+    {
+      "id": "padding-bottom",
+      "type": "number",
+      "default": "20",
+      "label": "Bottom padding",
+      "suffix": "px"
+    },
+    {
+      "id": "input_disabled_background_color",
+      "type": "color",
+      "label": "Input disabled background color",
+      "default": "#EFEFEF"
+    }
+  ],
+  "strings": [
+    {
+      "id": "events.ticket_page.ticket_details",
+      "default": "TICKET DETAILS"
+    },
+    {
+      "id": "events.ticket_page.transferred_message",
+      "default": "This ticket has been transferred and is no longer valid."
+    },
+    {
+      "id": "events.ticket_page.cancelled_message",
+      "default": "This ticket has been cancelled or transferred to someone else. This ticket URL is no longer valid."
+    },
+    {
+      "id": "events.ticket_page.transferred_to",
+      "default": "Transferred to"
+    },
+    {
+      "id": "events.ticket_page.transfer_date",
+      "default": "Date"
+    },
+    {
+      "id": "events.general.first_name",
+      "default": "First Name"
+    },
+    {
+      "id": "events.general.last_name",
+      "default": "Last Name"
+    },
+    {
+      "id": "events.ticket_page.email_phone",
+      "default": "Email"
+    },
+    {
+      "id": "events.ticket_page.update_details",
+      "default": "Update Ticket Details"
+    },
+    {
+      "id": "events.ticket_page.update_transfer",
+      "default": "Transfer Ticket"
+    },
+    {
+      "id": "events.ticket_page.new_ticket_footnote",
+      "default": "Updating the email will generate a new ticket and send the ticket email to the new recipient. This ticket will be invalid."
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/ticket-formats' %}
+<div id="block-container--{{ block.name }}" class="ticket-formats">
+  {% for block in blocks %}
+    {% render_block block.name %}
+  {% endfor %}
+</div>
+{% schema %}
+{
+  "name": "Ticket formats",
+  "type": "ticket-formats",
+  "container": "none",
+  "blocks": [
+    "join-livestream",
+    "barcode",
+    "stub-info",
+    "download-options"
+  ],
+  "strings": [
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/join-livestream' %}
+{% if attendee.event_location_type == 'online' %}
+  {% if attendee.virtual_event_url != nil and attendee.show_virtual_event_url != '' %}
+    <a id="block-container--{{ block.name }}" href="{{ attendee.virtual_event_url }}" target='_blank' class="button button-secondary" style="margin-top:{{ block.settings.spacing_top }}px;margin-bottom:{{ block.settings.spacing_bottom }}px;background-color:{{ block.settings.button_color }};color:{{ block.settings.button_text_color }};">{{ "events.ticket_page.virtual_event_join" | t }}</a>
+  {% else %}
+    <div id="block-container--{{ block.name }}" class="flash-container warning" style="width:320px;margin-top:{{ block.settings.spacing_top }}px;margin-bottom:{{ block.settings.spacing_bottom }}px;">
+      <div class='flash-content'>
+        {{ "events.ticket_page.virtual_event_waiting" | t }}
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+{% schema %}
+{
+  "name": "Join Livestream",
+  "type": "join-livestream",
+  "container": "none",
+  "max_blocks": 0,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "This block is visible for events."
+    },
+    {
+      "id": "button_color",
+      "type": "color",
+      "default": "#000000",
+      "label": "Button color"
+    },
+    {
+      "id": "button_text_color",
+      "type": "color",
+      "default": "#FFFFFF",
+      "label": "Button text color"
+    },
+    {
+      "id": "spacing_top",
+      "type": "number",
+      "default": "0",
+      "label": "Top spacing",
+      "suffix": "px"
+    },
+    {
+      "id": "spacing_bottom",
+      "type": "number",
+      "default": "0",
+      "label": "Bottom spacing",
+      "suffix": "px"
+    }
+  ],
+  "strings": [
+    {
+      "id": "events.ticket_page.virtual_event_waiting",
+      "default": "Your instructions to join the livestream will appear here before the event begins."
+    },
+    {
+      "id": "events.ticket_page.virtual_event_join",
+      "default": "Join Livestream"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/barcode' %}
+<div id="block-container--{{ block.name }}" class='qr-outer-container' style="margin-bottom:{{ block.settings.spacing_bottom }}px;">
+  <div class='qr-inner-container'>
+    <img class="qrcode" src="{% if block.settings.custom_image != nil and block.settings.custom_image != nil %}{{ block.settings.custom_image }}{% else %}data:image/png;base64,{{ qr_data }}{% endif %}" />
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Barcode",
+  "type": "barcode",
+  "container": "none",
+  "max_blocks": 0,
+  "settings": [
+    {
+      "id": "custom_image",
+      "label": "Custom image",
+      "type": "image",
+      "info": "Replace dynamic QR code with a custom image",
+      "max_width": 900,
+      "max_height": 900
+    },
+    {
+      "id": "spacing_top",
+      "type": "number",
+      "default": "16",
+      "label": "Top spacing",
+      "suffix": "px"
+    },
+    {
+      "id": "spacing_bottom",
+      "type": "number",
+      "default": "0",
+      "label": "Bottom spacing",
+      "suffix": "px"
+    }
+  ],
+  "strings": [
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/stub-info' %}
+<div id="block-container--{{ block.name }}" class="stub-info" style="margin-bottom:{{ block.settings.spacing_bottom }}px;">
+  <div class="issue-date"><strong>{{ "events.general.date_issued" | t }}</strong>: {{ attendee.purchased_on | date:"%b %e, %Y" }}</div>
+  <div class="ticket-number"><strong>{{ "events.general.ticket_number" | t }}</strong>: {{ attendee.ticket_code }}</div>
+  {% if event.tickets.size > 1 %}
+    <div class="ticket-type"><strong>{{ "events.general.ticket_type" | t }}</strong>:<strong> {{ attendee.ticket.title }}</strong>{% if event.has_seating %} / {{ attendee.seat_label }}{% endif %}</div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "Stub info",
+  "type": "stub-info",
+  "container": "none",
+  "max_blocks": 0,
+  "settings": [
+    {
+      "id": "spacing_top",
+      "type": "number",
+      "default": "16",
+      "label": "Top spacing",
+      "suffix": "px"
+    },
+    {
+      "id": "spacing_bottom",
+      "type": "number",
+      "default": "0",
+      "label": "Bottom spacing",
+      "suffix": "px"
+    }
+  ],
+  "strings": [
+    {
+      "id": "events.general.date_issued",
+      "default": "Date issued"
+    },
+    {
+      "id": "events.general.ticket_number",
+      "default": "Ticket number"
+    },
+    {
+      "id": "events.general.ticket_type",
+      "default": "Ticket type"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/download-options' %}
+<div id="block-container--{{ block.name }}" class="download-options" style="margin-top:{{ block.settings.spacing_top }}px;margin-bottom:{{ block.settings.spacing_bottom }}px;">
+  {% if event.has_pdf_ticket_type %}
+    <div class="download-ticket" style="padding: 10px 0;">
+      <a href="{{ attendee.pdf_ticket_url }}" target="_blank" style="text-decoration: none;font-family: 'Causten', sans-serif;line-height: 24px;background: #0F2C70;color: #fff;padding: 10px;margin: 10px 0;border-radius: 5px;">{{ "events.ticket_page.download_pdf" | t }}</a></div>
+  {% endif %}
+  {% if event.has_passbook_ticket_type %}
+    <div class="download-ticket" style="padding: 10px 0;"><a href="{{ attendee.passbook_ticket_url }}" target="_blank"style="font-family: 'Causten', sans-serif;text-decoration: none;line-height: 24px;background: #0F2C70;color: #fff;padding: 10px;margin: 10px 0;border-radius: 5px;">{{ "events.ticket_page.download_apple_pass" | t }}</a></div>
+  {% endif %}
+  {% if event.has_calendar_options and attendee.event_start_at_date %}
+    <div class="add-to-calendar download-ticket">
+      <strong>{{ "events.ticket_page.add_to_calendar" | t }}</strong>
+      <div class="calendar-options">
+        <a href="{{ attendee.add_to_calendar_google_url }}" target="_blank">{{ "events.ticket_page.google_calendar" | t }}</a>
+        <a href="{{ attendee.add_to_calendar_outlook_url }}" target="_blank">{{ "events.ticket_page.outlook_calendar" | t }}</a>
+        <a href="{{ attendee.ics_ticket_url }}" target="_blank">{{ "events.ticket_page.other_calendars" | t }}</a>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% schema %}
+{
+  "name": "Download options",
+  "type": "download-options",
+  "container": "none",
+  "max_blocks": 0,
+  "settings": [
+    {
+      "id": "spacing_top",
+      "type": "number",
+      "default": "16",
+      "label": "Top spacing",
+      "suffix": "px"
+    },
+    {
+      "id": "spacing_bottom",
+      "type": "number",
+      "default": "0",
+      "label": "Bottom spacing",
+      "suffix": "px"
+    }
+  ],
+  "strings": [
+    {
+      "id": "events.ticket_page.download_pdf",
+      "default": "Download PDF"
+    },
+    {
+      "id": "events.ticket_page.download_apple_pass",
+      "default": "Download Apple Wallet Pass"
+    },
+    {
+      "id": "events.ticket_page.add_to_calendar",
+      "default": "Add to calendar"
+    },
+    {
+      "id": "events.ticket_page.google_calendar",
+      "default": "Google"
+    },
+    {
+      "id": "events.ticket_page.outlook_calendar",
+      "default": "Outlook"
+    },
+    {
+      "id": "events.ticket_page.other_calendars",
+      "default": "Other calendars"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/attendee-form' %}
+<div class="attendee-details">
+  <form id="details-form" action="" method="post">
+    <div class='form-group{% if event.allow_transfers == false %} disabled{% endif %}'>
+      <input {% if event.allow_transfers == false %} disabled {% endif %}  name="attendee[first_name]" type="text" value="{{ attendee.first_name }}" placeholder="FIRST NAME" required />
+    </div>
+    <div class='form-group{% if event.allow_transfers == false %} disabled{% endif %}'>
+      <input {% if event.allow_transfers == false %} disabled {% endif %}  name="attendee[last_name]" type="text" value="{{ attendee.last_name }}" placeholder="LAST NAME" required />
+    </div>
+    <div class='form-group{% if event.allow_transfers == false %} disabled{% endif %}'>
+      <input id="emailphone" {% if event.allow_transfers == false %} disabled {% endif %} name="attendee[email]" type="email" value="{{ attendee.email }}" placeholder="EMAIL" required />
+    </div>
+    {% assign ticket_attributes_count = 0 %}
+    {% for attr in attendee.ticket_attributes %}
+      {% assign t_label = "events.general." | append: attr.spec.name %}
+      {% if attr.spec.type == "checkbox" %}
+        <div class='form-group{% if attr.spec.readonly_ticket_page == true %} disabled{% endif %}'>
+          <select id="{{ attr.spec.name }}" name="attendee[attendee_attributes][{{ attr.spec.name }}]" {% if attr.spec.readonly_ticket_page == true %} disabled {% endif %}>
+            <option value="1" {% if attr.value == true %}selected{% endif %}>{{ "events.general.yes" | t | default: "Yes" }}</option>
+            <option value="0" {% if attr.value != true %}selected{% endif %} >{{ "events.general.no" | t | default: "No" }}</option>
+          </select>
+          <label>{{ t_label | t | default: attr.spec.label  }}</label>
+        </div>
+      {% elsif attr.spec.type == 'select' %}
+        <div class='form-group{% if attr.spec.readonly_ticket_page == true %} disabled{% endif %}'>
+          <select id="{{ attr.spec.name }}" name="attendee[attendee_attributes][{{ attr.spec.name }}]" {% if attr.spec.readonly_ticket_page == true %} disabled {% endif %}>
+            {% for option in attr.spec.options %}
+              {% assign cleaned_option = option | strip %}
+              {% assign option_t = "events.ticket_page.info_option_" | append: cleaned_option %}
+              <option value="{{ option }}" {% if attr.value == cleaned_option %}selected{% endif %}>{{ option_t | t | default: cleaned_option }}</option>
+            {% endfor %}
+          </select>
+          <label>{{ t_label | t | default: attr.spec.label  }}</label>
+        </div>
+      {% elsif attr.spec.type == 'text' %}
+        <div class='form-group{% if attr.spec.readonly_ticket_page == true %} disabled{% endif %}'>
+          <input name="attendee[attendee_attributes][{{ attr.spec.name }}]" type="text" value="{{ attr.value }}" {% if attr.spec.readonly_ticket_page == true %} disabled {% endif %} />
+          <label>{{ t_label | t | default: attr.spec.label  }}</label>
+        </div>
+      {% elsif attr.spec.type == 'choice' %}
+        <div class='form-group{% if attr.spec.readonly_ticket_page == true %} disabled{% endif %}'>
+          <div class="choicelist" data-value="{{ attr.value }}">
+            {% for option in attr.spec.options %}
+              {% assign option_t = "events.ticket_page.info_option_" | append: option %}
+              <div class="choice">
+                <input name="attendee[attendee_attributes][{{ attr.spec.name }}][]" type="{% if attr.spec.allow_multiple %}checkbox{% else %}radio{% endif %}" value="{{ option }}" {% if attr.value contains option %}checked{% endif %} /><span>{{ option }}</span></br>
+              </div>
+            {% endfor %}
+          </div>
+          <label>{{ t_label | t | default: attr.spec.label  }}</label>
+        </div>
+      {% elsif attr.spec.type == 'header' %}
+        <div class='form-group static-content'>
+          <h4>{{ t_label | t | default: attr.spec.label  }}</h4>
+        </div>
+      {% elsif attr.spec.type == 'custom' %}
+        <div class='form-group static-content'>{{ t_label | t | default: attr.spec.label  }}</div>
+      {% endif %}
+      {% if attr.spec.readonly_ticket_page != true %}
+        {% assign ticket_attributes_count = ticket_attributes_count | plus: 1 %}
+      {% endif %}
+    {% endfor %}
+    {% if flash.notice != nil and flash.notice != empty %}
+      {% assign notice_translation_code = "events.ticket_page.notice_" | append: flash.notice_code %}
+      {% assign notice_message = notice_translation_code | t %}
+      <div class="flash-container"><div class='flash-content'>{{ notice_message }}</div></div>
+    {% endif %}
+    {% if event.allow_transfers or ticket_attributes_count > 0 %}
+      <button id="submit-button" type="submit">{{ "events.ticket_page.update_details" | t }}</button>
+    {% endif %}
+  </form>
+  <p class="transfer-notice">
+    {% if event.allow_transfers %}
+      {{ "events.ticket_page.new_ticket_footnote" | t }}
+    {% endif %}
+  </p>
+</div>
+<script evey>
+  document.addEventListener('click', function(e) {
+    e = e || window.event;
+    var target = e.target || e.srcElement;
+    if (target.matches('.choice span')) {
+      var checkboxInput = target.closest('.choice').querySelector('input[type="checkbox"]');
+      if (checkboxInput) {
+        checkboxInput.checked = !checkboxInput.checked;
+      }
+      var radioInput = target.closest('.choice').querySelector('input[type="radio"]');
+      if (radioInput) {
+        radioInput.checked = true;
+      }
+    }
+  });
+  document.addEventListener("DOMContentLoaded", function() {
+  const qr = document.querySelector('.qr-outer-container');
+  const stub = document.querySelector('.stub-info');
+  const downloadOptions = document.querySelector('.download-options');
+  const tickets = document.querySelectorAll('.download-options .download-ticket, .download-ticket'); // safety
+  // ✅ 1. Create .parent-div and wrap qr + stub
+  if (qr && stub) {
+    let parentDiv = document.querySelector('.parent-div');
+    if (!parentDiv) {
+      parentDiv = document.createElement('div');
+      parentDiv.classList.add('parent-div');
+      qr.parentNode.insertBefore(parentDiv, qr);
+    }
+    parentDiv.appendChild(qr);
+    parentDiv.appendChild(stub);
+  }
+  // ✅ 2. Move only .download-ticket buttons (PDF + Apple Wallet) into .stub-info
+  if (stub && tickets.length > 0) {
+    tickets.forEach(ticket => {
+      // move only if not inside .stub-info already
+      if (ticket.parentElement !== stub && !ticket.classList.contains('add-to-calendar')) {
+        stub.appendChild(ticket);
+      }
+    });
+  }
+});
+</script>
+{% schema %}
+{
+  "name": "Attendee Form",
+  "type": "attendee-form",
+  "max_blocks": 0,
+  "settings": [
+  ],
+  "strings": [
+    {
+      "id": "events.general.first_name",
+      "default": "First Name"
+    },
+    {
+      "id": "events.general.last_name",
+      "default": "Last Name"
+    },
+    {
+      "id": "events.ticket_page.email_phone",
+      "default": "Email"
+    },
+    {
+      "id": "events.ticket_page.phone",
+      "default": "Phone"
+    },
+    {
+      "id": "events.ticket_page.update_details",
+      "default": "Update Ticket Details"
+    },
+    {
+      "id": "events.ticket_page.update_transfer",
+      "default": "Transfer Ticket"
+    },
+    {
+      "id": "events.ticket_page.new_ticket_footnote",
+      "default": "Updating the email will generate a new ticket and send the ticket email to the new recipient. This ticket will be invalid."
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
+{% inline 'blocks/notes' %}
+{% if block.settings.notes != empty and block.settings.notes != nil %}
+  <style>
+    .instructions {
+      padding-top:{{ block.settings['padding-top'] }}px;
+      padding-bottom:{{ block.settings['padding-bottom'] }}px;
+      margin-left:{{ block.settings['margin-left'] }}px;
+      margin-right:{{ block.settings['margin-right'] }}px;
+    }
+    .instructions-label {
+      font-weight: bold;
+      font-family:  {{ font_family }};
+      color:#111111;
+      font-size:{{ block.settings['heading-font-size'] }}px;
+      line-height:{{ block.settings['heading-font-size'] | plus: 4 }}px;
+    }
+    .instructions-text {
+      margin-top:13px;
+      color:#333333;
+      font-family: {{ font_family }};
+      font-size:12px;
+      line-height:15px;
+      white-space: pre-wrap;
+      margin-right:70px;
+    }
+    @media (max-width: 800px) {
+      .instructions-text {
+        margin-right:20px;
+      }
+    }
+  </style>
+  <div class="instructions">
+    <div class="instructions-label">{{ "events.ticket_page.instructions" | t }}</div>
+    <pre class="instructions-text">{{ block.settings.notes }}</pre>
+  </div>
+{% endif %}
+{% schema %}
+{
+  "name": "Notes",
+  "type": "notes",
+  "settings": [
+    {
+      "id": "notes",
+      "type": "textarea",
+      "label": "Notes / Instructions",
+      "info": "Supports HTML formatting"
+    },
+    {
+      "type": "header",
+      "content": "Style settings"
+    },
+    {
+      "id": "padding-top",
+      "type": "number",
+      "default": "40",
+      "label": "Top padding",
+      "suffix": "px"
+    },
+    {
+      "id": "padding-bottom",
+      "type": "number",
+      "default": "20",
+      "label": "Bottom padding",
+      "suffix": "px"
+    },
+    {
+      "id": "margin-left",
+      "type": "number",
+      "default": "24",
+      "label": "Left margin",
+      "suffix": "px"
+    },
+    {
+      "id": "margin-right",
+      "type": "number",
+      "default": "24",
+      "label": "Right margin",
+      "suffix": "px"
+    },
+    {
+      "id": "heading-font-size",
+      "type": "number",
+      "default": "12",
+      "label": "Heading font size",
+      "suffix": "px"
+    }
+  ],
+  "strings": [
+    {
+      "id": "events.ticket_page.instructions",
+      "default": "Event Info"
+    }
+  ]
+}
+{% endschema %}
+{% endinline %}
