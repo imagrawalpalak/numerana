@@ -1,0 +1,553 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;1,9..144,600;1,9..144,700&family=Mona+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    @font-face {
+      font-family: 'Helvetica Neue';
+      src: url({{ "Helvetica Neue" | font }});
+      font-weight: normal;
+    }
+    @font-face {
+      font-family: 'Helvetica Neue';
+      src: url({{ "Helvetica Neue Bold" | font }});
+      font-weight: bold;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #FBF5EA;
+    }
+    body {
+      font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.4em;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  {% for block in blocks %}
+    {% render_block block.name %}
+  {% endfor %}
+</body>
+</html>
+{% schema %}
+{
+  "name": "Numerana Event Ticket",
+  "type": "template",
+  "blocks": ["numerana-ticket"],
+  "settings": [
+    {
+      "type": "header",
+      "content": "Custom page size"
+    },
+    {
+      "type": "paragraph",
+      "content": "Set a custom page width and height in inches for the PDF ticket. Leave them blank for the default of A4 paper size."
+    },
+    {
+      "id": "page_width",
+      "type": "number",
+      "label": "Page width",
+      "suffix": "inches",
+      "placeholder": "8.27"
+    },
+    {
+      "id": "page_height",
+      "type": "number",
+      "label": "Page height",
+      "suffix": "inches",
+      "placeholder": "11.7"
+    }
+  ],
+  "strings": []
+}
+{% endschema %}
+{% inline 'blocks/numerana-ticket' %}
+{% comment %} ===== Variant detection: colour + wording from the ticket name ===== {% endcomment %}
+{% assign t = attendee.ticket.title | strip | downcase %}
+{% if t contains "superior" %}
+  {% assign accent = block.settings.color_superior %}
+  {% assign title_line1 = "Luneta" %}
+  {% assign title_line2 = "Superior" %}
+  {% assign pill_text = "PRIMER PISO LUNETA SUPERIOR" %}
+  {% assign badge_text = "LUNETA SUPERIOR" %}
+{% elsif t contains "segundo" %}
+  {% assign accent = block.settings.color_segundo %}
+  {% assign title_line1 = "Segundo" %}
+  {% assign title_line2 = "Piso" %}
+  {% assign pill_text = "SEGUNDO PISO" %}
+  {% assign badge_text = "SEGUNDO PISO" %}
+{% else %}
+  {% assign accent = block.settings.color_baja %}
+  {% assign title_line1 = "Luneta" %}
+  {% assign title_line2 = "Baja" %}
+  {% assign pill_text = "PRIMER PISO LUNETA BAJA" %}
+  {% assign badge_text = "LUNETA BAJA" %}
+{% endif %}
+{% assign date_format = block.settings.date_format | default: "%d de %B de %Y" %}
+{% assign time_format = block.settings.time_format | default: "%l:%M %P" %}
+{% assign site_url = block.settings.website_url | default: "https://www.numerana.com" %}
+{% comment %}
+  All sizes below are in inches (design size 1080 x 1528 px = 8.27 x 11.7 in),
+  so the layout is identical in the editor preview and in the PDF.
+{% endcomment %}
+<style>
+  .nt-page {
+    position: relative;
+    width: 8.27in;
+    height: 11.7in;
+    overflow: hidden;
+    background: #FBF5EA;
+    -webkit-transform: scale(1.25);
+    -webkit-transform-origin: 0 0;
+    transform: scale(1.25);
+    transform-origin: 0 0;
+  }
+  .nt-canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 8.27in;
+    height: 11.7in;
+    overflow: hidden;
+    background-color: #FBF5EA;
+    {% if block.settings.show_frame %}
+    border-radius: 0.2757in;
+    {% endif %}
+    color: #14233c;
+    font-family: "Fraunces", Georgia, "Times New Roman", serif;
+  }
+  .nt-abs { position: absolute; }
+  /* ---- Background image (cropped so the outer shadow/margin never shows) ---- */
+  .nt-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .nt-bg img { position: absolute; display: block; }
+  /* ---- Top right pill ---- */
+  .nt-pill {
+    right: 0.3676in;
+    top: 0.5513in;
+    height: 0.2604in;
+    line-height: 0.2604in;
+    padding: 0 0.1685in;
+    border-radius: 0.1302in;
+    background: {{ accent }};
+    color: #ffffff;
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.0995in;
+    font-weight: 700;
+    letter-spacing: 0.0153in;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  /* ---- Label + big title ---- */
+  .nt-category {
+    left: 0.536in;
+    top: 1.6999in;
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.1225in;
+    font-weight: 700;
+    letter-spacing: 0.0383in;
+    text-transform: uppercase;
+    color: {{ accent }};
+  }
+  .nt-heading {
+    left: 0.5054in;
+    top: 2.1517in;
+    width: 3.8287in;
+    margin: 0;
+    font-size: 0.9036in;
+    line-height: 1.1256in;
+    font-weight: 700;
+    letter-spacing: -0.0153in;
+    color: #14233c;
+  }
+  .nt-heading .nt-heading-accent {
+    display: block;
+    font-style: italic;
+    color: {{ accent }};
+  }
+  /* ---- Event title, date and time ---- */
+  .nt-event-title {
+    left: 0.536in;
+    top: 5.0845in;
+    width: 5.6665in;
+    margin: 0;
+    font-size: 0.2297in;
+    line-height: 0.3063in;
+    font-weight: 700;
+    font-style: italic;
+  }
+  .nt-meta {
+    top: 6.0034in;
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.1378in;
+    line-height: 0.1838in;
+    white-space: nowrap;
+  }
+  .nt-icon {
+    width: 0.1531in;
+    height: 0.1531in;
+    margin-right: 0.0766in;
+    vertical-align: -0.023in;
+  }
+  /* ---- Ticket details panel ---- */
+  .nt-box {
+    left: 0.4288in;
+    top: 6.5088in;
+    width: 7.4124in;
+    height: 3.4611in;
+    overflow: hidden;
+    background: {{ accent }};
+    border-radius: 0.245in;
+  }
+  .nt-flower {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 7.4124in;
+    height: 3.4611in;
+  }
+  .nt-qr-card {
+    left: 0.7657in;
+    top: 6.8457in;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 2.2972in;
+    height: 2.2972in;
+    padding: 0.1225in;
+    border-radius: 0.1838in;
+    background: #ffffff;
+    box-shadow: 0 0.0613in 0.1838in rgba(0, 0, 0, 0.18);
+  }
+  .nt-qr-card img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .nt-ticket-label {
+    left: 0.7657in;
+    top: 9.3114in;
+    width: 2.2972in;
+    text-align: center;
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.1072in;
+    line-height: 0.1378in;
+    font-weight: 600;
+    letter-spacing: 0.0184in;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .nt-ticket-code {
+    left: 0.7657in;
+    top: 9.4416in;
+    width: 2.2972in;
+    text-align: center;
+    font-size: 0.2757in;
+    line-height: 0.3676in;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .nt-label {
+    left: 3.4305in;
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.0995in;
+    line-height: 0.1225in;
+    font-weight: 600;
+    letter-spacing: 0.0184in;
+    text-transform: uppercase;
+    color: #ffffff;
+  }
+  .nt-name {
+    left: 3.4305in;
+    top: 7.0831in;
+    width: 4.135in;
+    font-size: 0.2757in;
+    line-height: 0.3369in;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+  .nt-divider-line {
+    left: 3.4305in;
+    top: 7.6268in;
+    width: 2.9098in;
+    height: 0.0115in;
+    background: rgba(255, 255, 255, 0.25);
+  }
+  .nt-value {
+    left: 3.4305in;
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.1685in;
+    line-height: 0.2144in;
+    font-weight: 400;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+  .nt-badge {
+    left: 3.4305in;
+    top: 9.1736in;
+    height: 0.2986in;
+    line-height: 0.2986in;
+    padding: 0 0.1378in;
+    border-radius: 0.1531in;
+    background: #ffffff;
+    color: {{ accent }};
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.1149in;
+    font-weight: 600;
+    letter-spacing: 0.0153in;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .nt-badge-dot {
+    display: inline-block;
+    width: 0.0766in;
+    height: 0.0766in;
+    margin-right: 0.0766in;
+    border-radius: 0.0383in;
+    background: {{ accent }};
+    vertical-align: middle;
+  }
+  /* ---- Venue + clickable website (the website text is part of the image) ---- */
+  .nt-venue {
+    left: 0.7964in;
+    top: 10.2609in;
+    width: 5.8196in;
+    font-family: "Mona Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 0.0995in;
+    line-height: 0.1838in;
+  }
+  .nt-venue-icon {
+    left: 0.5513in;
+    top: 10.2916in;
+    width: 0.1531in;
+    height: 0.1531in;
+  }
+  .nt-link {
+    left: 6.3556in;
+    top: 10.6897in;
+    width: 1.4549in;
+    height: 0.3063in;
+    display: block;
+    text-decoration: none;
+    color: transparent;
+    font-size: 0.1531in;
+    line-height: 0.3063in;
+    z-index: 50;
+  }
+</style>
+<div class="nt-page">
+  <div class="nt-canvas">
+    <!-- Background image -->
+    {% if block.settings.background_image %}
+    <div class="nt-bg">
+      {% if block.settings.crop_margins %}
+        <img src="{{ block.settings.background_image }}" alt="" style="width:111.32%; height:108%; left:-5.659%; top:-2.032%;" />
+      {% else %}
+        <img src="{{ block.settings.background_image }}" alt="" style="width:100%; height:100%; left:0; top:0;" />
+      {% endif %}
+    </div>
+    {% endif %}
+    <!-- Pill -->
+    <div class="nt-abs nt-pill">&bull;&nbsp; {{ pill_text }}</div>
+    <!-- Label + heading -->
+    <div class="nt-abs nt-category" style="color:{{ accent }};">Boletos</div>
+    <h1 class="nt-abs nt-heading">
+      {{ title_line1 }}
+      <span class="nt-heading-accent">{{ title_line2 }}</span>
+    </h1>
+    <!-- Event title, date, time -->
+    <p class="nt-abs nt-event-title">{{ event.title }}</p>
+    <div class="nt-abs nt-meta" style="left:0.536in;">
+      <svg class="nt-icon" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>{{ attendee.event_start_at | date: date_format }}
+    </div>
+    <div class="nt-abs nt-meta" style="left:3.3386in;">
+      <svg class="nt-icon" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>{{ attendee.event_start_at | date: time_format | strip }} &ndash; {{ attendee.event_end_at | date: time_format | strip }}
+    </div>
+    <!-- Ticket details panel with flower-of-life pattern -->
+    <div class="nt-abs nt-box">
+      <svg class="nt-flower" viewBox="0 0 968 452" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.2">
+        <circle cx="830" cy="130" r="159"/>
+        <circle cx="830" cy="130" r="166"/>
+        <circle cx="830" cy="130" r="53"/>
+        <circle cx="883" cy="130" r="53"/>
+        <circle cx="856.5" cy="175.9" r="53"/>
+        <circle cx="803.5" cy="175.9" r="53"/>
+        <circle cx="777" cy="130" r="53"/>
+        <circle cx="803.5" cy="84.1" r="53"/>
+        <circle cx="856.5" cy="84.1" r="53"/>
+        <circle cx="909.5" cy="175.9" r="53"/>
+        <circle cx="830" cy="221.8" r="53"/>
+        <circle cx="750.5" cy="175.9" r="53"/>
+        <circle cx="750.5" cy="84.1" r="53"/>
+        <circle cx="830" cy="38.2" r="53"/>
+        <circle cx="909.5" cy="84.1" r="53"/>
+        <circle cx="936" cy="130" r="53"/>
+        <circle cx="883" cy="221.9" r="53"/>
+        <circle cx="777" cy="221.9" r="53"/>
+        <circle cx="724" cy="130" r="53"/>
+        <circle cx="777" cy="38.1" r="53"/>
+        <circle cx="883" cy="38.1" r="53"/>
+      </svg>
+    </div>
+    <!-- QR card + ticket number -->
+    <div class="nt-abs nt-qr-card">
+      {% if block.settings.custom_qr_image %}
+        <img src="{{ block.settings.custom_qr_image }}" alt="Ticket QR Code" />
+      {% else %}
+        <img src="data:image/png;base64,{{ qr_data }}" alt="Ticket QR Code" />
+      {% endif %}
+    </div>
+    <div class="nt-abs nt-ticket-label">N.º de boleto</div>
+    <div class="nt-abs nt-ticket-code">{{ attendee.ticket_code }}</div>
+    <!-- Attendee, date, time, badge -->
+    <div class="nt-abs nt-label" style="top:6.9146in;">Asistente</div>
+    <div class="nt-abs nt-name">{{ attendee.name }}</div>
+    <div class="nt-abs nt-divider-line"></div>
+    <div class="nt-abs nt-label" style="top:7.8259in;">Fecha</div>
+    <div class="nt-abs nt-value" style="top:8.0096in;">{{ attendee.event_start_at | date: date_format }}</div>
+    <div class="nt-abs nt-label" style="top:8.4538in;">Horario</div>
+    <div class="nt-abs nt-value" style="top:8.6376in;">{{ attendee.event_start_at | date: time_format | strip }} &ndash; {{ attendee.event_end_at | date: time_format | strip }}</div>
+    <div class="nt-abs nt-badge"><span class="nt-badge-dot"></span>{{ badge_text }}</div>
+    <!-- Venue -->
+    <svg class="nt-abs nt-venue-icon" viewBox="0 0 24 24" fill="none" stroke="{{ accent }}" stroke-width="2"><path d="M12 22s7-7 7-12a7 7 0 10-14 0c0 5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    <div class="nt-abs nt-venue">
+      {% if block.settings.venue_line1 %}{{ block.settings.venue_line1 }}{% endif %}
+      {% if block.settings.venue_line2 %}{{ block.settings.venue_line2 }}{% endif %}
+      {% if block.settings.venue_address %}<br/>{{ block.settings.venue_address }}{% endif %}
+    </div>
+    <!-- Clickable www.numerana.com (sits on top of the text in the background image) -->
+    <a class="nt-abs nt-link" href="{{ site_url }}">&nbsp;</a>
+  </div>
+</div>
+{% schema %}
+{
+  "name": "Numerana Ticket",
+  "type": "numerana-ticket",
+  "max_blocks": 0,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Variant colours"
+    },
+    {
+      "type": "paragraph",
+      "content": "Colour is chosen automatically from the ticket name: contains 'superior' = Luneta Superior, contains 'segundo' = Segundo Piso, anything else = Luneta Baja."
+    },
+    {
+      "type": "color",
+      "id": "color_baja",
+      "default": "#E8873A",
+      "label": "Luneta Baja colour"
+    },
+    {
+      "type": "color",
+      "id": "color_superior",
+      "default": "#2F6FD6",
+      "label": "Luneta Superior colour"
+    },
+    {
+      "type": "color",
+      "id": "color_segundo",
+      "default": "#337F4A",
+      "label": "Segundo Piso colour"
+    },
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "paragraph",
+      "content": "Upload the original background image (card with its outer shadow and margin). Keep the checkbox below ticked so the margin is cropped out automatically. If you upload a card-only image instead, untick it."
+    },
+    {
+      "type": "image",
+      "id": "background_image",
+      "label": "Background image",
+      "max_width": 2160,
+      "max_height": 3056
+    },
+    {
+      "type": "checkbox",
+      "id": "crop_margins",
+      "default": true,
+      "label": "Background image includes the outer shadow/margin (crop it)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_frame",
+      "default": true,
+      "label": "Round the card corners"
+    },
+    {
+      "type": "text",
+      "id": "website_url",
+      "label": "Website link",
+      "default": "https://www.numerana.com",
+      "info": "Opened when someone clicks www.numerana.com on the ticket"
+    },
+    {
+      "type": "header",
+      "content": "QR Code"
+    },
+    {
+      "type": "image",
+      "id": "custom_qr_image",
+      "label": "Custom QR image",
+      "info": "Optional: Replace dynamic QR code with a custom image",
+      "max_width": 500,
+      "max_height": 500
+    },
+    {
+      "type": "header",
+      "content": "Formats"
+    },
+    {
+      "id": "date_format",
+      "type": "text",
+      "label": "Date format",
+      "default": "%d de %B de %Y",
+      "info": "Liquid date format string"
+    },
+    {
+      "id": "time_format",
+      "type": "text",
+      "label": "Time format",
+      "default": "%l:%M %P",
+      "info": "Liquid time format string"
+    },
+    {
+      "type": "header",
+      "content": "Venue Information"
+    },
+    {
+      "id": "venue_line1",
+      "type": "text",
+      "label": "Venue line 1",
+      "default": "Auditorio El Cantoral, Puente Xoco, s/n-Puerta A, Xoco, Benito Juárez,"
+    },
+    {
+      "id": "venue_line2",
+      "type": "text",
+      "label": "Venue line 2",
+      "default": ""
+    },
+    {
+      "id": "venue_address",
+      "type": "text",
+      "label": "Venue address",
+      "default": "03330 Ciudad de México, CDMX"
+    }
+  ],
+  "strings": []
+}
+{% endschema %}
+{% endinline %}
