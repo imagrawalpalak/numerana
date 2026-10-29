@@ -1,0 +1,612 @@
+{% comment %}
+  Numerana – Evey ticket page (Encuentro Anual 2027).
+  Desktop: event lockup, event info strip, then form (left) + ticket (right).
+  Below 800px everything stacks and the ticket comes before the form.
+{% endcomment %}
+{%- assign months_es = "enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre" | split: "," -%}
+{%- assign days_es = "Domingo,Lunes,Martes,Miércoles,Jueves,Viernes,Sábado" | split: "," -%}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ event.title }} - {{ "events.general.ticket" | t }} {{ attendee.ticket_code }}</title>
+  <link rel="stylesheet" href="https://use.typekit.net/ypm1mrv.css">
+  <style>
+    :root {
+      --navy: #0A2A4E;
+      --navy-deep: #06213F;
+      --ink: #0B2A4A;
+      --muted: #5B6B7D;
+      --gold: #D3853D;
+      --gold-soft: #E8C98F;
+      --sand: #EFD3B8;
+      --sand-soft: #FCF3EA;
+      --yellow: #FFD811;
+      --cream: #FDF8EC;
+      --serif: 'Cambon', Georgia, serif;
+      --sans: 'Causten', 'Helvetica Neue', Arial, sans-serif;
+      --corner: url('data:image/png;base64,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');
+    }
+    * { box-sizing: border-box; }
+    body {
+      position: relative;
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--cream) url('https://cdn.shopify.com/s/files/1/0617/5024/7497/files/bg.webp') center top / cover;
+      font-family: var(--sans);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+    /* ---------- Page frame: gold corner brackets + faint numerals ---------- */
+    .corner {
+      position: absolute;
+      width: 108px;
+      height: 78px;
+      background: var(--corner) center / contain no-repeat;
+      pointer-events: none;
+    }
+    .corner--tl { top: 20px; left: 20px; transform: scaleX(-1); }
+    .corner--tr { top: 20px; right: 20px; }
+    .corner--bl { bottom: 20px; left: 20px; transform: scale(-1, -1); }
+    .corner--br { bottom: 20px; right: 20px; transform: scaleY(-1); }
+    .numerals span {
+      position: absolute;
+      font-family: var(--serif);
+      font-weight: 700;
+      color: rgba(211, 133, 61, 0.12);
+      pointer-events: none;
+      user-select: none;
+    }
+    /* ---------- Event lockup (navy half-disc hanging from the top) ---------- */
+    .hero {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      height: 300px;
+      overflow: hidden;
+      padding-bottom: 14px;
+    }
+    .hero__disc {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      width: 640px;
+      height: 640px;
+      margin-left: -320px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 50% 75%, #123A68 0%, var(--navy) 45%, var(--navy-deep) 100%);
+      box-shadow: 0 0 0 10px var(--cream), 0 0 0 11px var(--sand), 0 18px 40px rgba(6, 33, 63, 0.18);
+    }
+    .hero__lockup {
+      position: relative;
+      align-self: flex-end;
+      margin-bottom: 64px;
+      text-align: center;
+      color: #fff;
+    }
+    .hero__rings { display: block; width: 96px; height: 92px; margin: 0 auto 12px; }
+    .hero__kicker {
+      margin: 0;
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+    .hero__kicker small { font-size: 11px; }
+    .hero__title {
+      margin: 4px 0 0;
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 1.25;
+      letter-spacing: 0.01em;
+    }
+    .hero__title i { font-weight: 400; }
+    .spark { color: var(--gold-soft); font-style: normal; font-size: 0.6em; vertical-align: middle; margin: 0 6px; }
+    .hero__rule {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 260px;
+      margin: 12px auto 0;
+      color: var(--gold-soft);
+    }
+    .hero__rule::before,
+    .hero__rule::after { content: ''; flex: 1; height: 1px; background: currentColor; opacity: 0.7; }
+    /* ---------- Layout ---------- */
+    .page {
+      position: relative;
+      max-width: 1064px;
+      margin: 0 auto;
+      padding: 36px 20px 120px;
+    }
+    .card { border-radius: 16px; padding: 40px; }
+    /* ---------- Event info strip ---------- */
+    .info {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-bottom: 48px;
+      padding: 28px 0;
+      background: #fff;
+      border: 1px solid var(--sand);
+      border-radius: 16px;
+    }
+    .info__item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 28px;
+      text-align: center;
+    }
+    .info__item + .info__item { border-left: 1px solid var(--sand); }
+    .info__icon {
+      display: grid;
+      place-items: center;
+      flex: none;
+      width: 52px;
+      height: 52px;
+      margin-bottom: 14px;
+      border: 1px solid var(--sand);
+      border-radius: 50%;
+      background: var(--sand-soft);
+      color: var(--gold);
+    }
+    .info__label {
+      margin: 0 0 6px;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .info__value {
+      margin: 0;
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+    .info__value a { color: inherit; text-decoration: none; }
+    .info__sub { margin: 6px 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); }
+    /* ---------- Form + ticket ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: stretch;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      margin-bottom: 18px;
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .badge::before {
+      content: '';
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 2px rgba(211, 133, 61, 0.25);
+    }
+    .details { background: #fff; border: 1px solid var(--sand); }
+    .details h1 {
+      margin: 0 0 14px;
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 36px;
+      line-height: 1.1;
+    }
+    .details .intro { margin: 0 0 28px; font-size: 15px; line-height: 1.55; color: var(--ink); opacity: 0.85; }
+    form { display: flex; flex-direction: column; gap: 22px; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field { display: flex; flex-direction: column; gap: 10px; }
+    .field span { font-size: 14px; }
+    .field input {
+      width: 100%;
+      height: 52px;
+      padding: 0 16px;
+      border: 1px solid #9C7A63;
+      border-radius: 10px;
+      background: #fff;
+      font: inherit;
+      font-size: 16px;
+      color: var(--ink);
+    }
+    .field input::placeholder { color: #6E7C8B; }
+    .field input:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold); }
+    .field input:disabled { background: #F6F4F1; color: var(--muted); }
+    #submit-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 48px;
+      margin-top: 2px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--navy-deep);
+      color: #fff;
+      font: inherit;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    #submit-button:hover { background: var(--navy); }
+    #submit-button:disabled { opacity: 0.6; cursor: wait; }
+    .flash { padding: 12px 16px; border-radius: 10px; background: #EAF6EE; color: #1F6B3A; font-size: 14px; }
+    .transfer-notice {
+      display: flex;
+      gap: 12px;
+      margin: 24px 0 0;
+      padding: 16px 18px;
+      background: var(--sand-soft);
+      border: 1px solid var(--sand);
+      border-radius: 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--ink);
+    }
+    .transfer-notice svg { flex: none; margin-top: 2px; color: var(--gold); }
+    .ticket {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 100%);
+      border: 1px solid #10365C;
+      color: #fff;
+      box-shadow: 0 24px 48px rgba(6, 33, 63, 0.22);
+    }
+    .ticket .badge { align-self: flex-start; border-color: rgba(232, 201, 143, 0.7); color: var(--gold-soft); }
+    .ticket .badge::before { background: #F2B53A; box-shadow: 0 0 0 2px rgba(242, 181, 58, 0.3); }
+    .stub { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 48px; }
+    .qr { flex: none; width: 172px; height: 172px; padding: 6px; background: #fff; }
+    .qr img { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+    .meta { margin: 0; }
+    .meta dt { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-soft); }
+    .meta dd { margin: 6px 0 18px; font-family: var(--serif); font-weight: 700; font-size: 21px; line-height: 1.2; }
+    .meta dd:last-child { margin-bottom: 0; }
+    .actions { display: flex; flex-direction: column; gap: 12px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      height: 48px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+    }
+    .btn--pdf { background: var(--yellow); color: var(--navy-deep); }
+    .btn--pdf:hover { background: #FFE14A; }
+    .btn--wallet { border: 1px solid rgba(255, 255, 255, 0.45); color: #fff; }
+    .btn--wallet:hover { border-color: #fff; }
+    /* Tear line: dashed rule with half-circle notches cut into both edges. */
+    .perforation {
+      position: relative;
+      margin: 32px -40px 28px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.3);
+    }
+    .perforation::before,
+    .perforation::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--cream);
+    }
+    .perforation::before { left: -10px; }
+    .perforation::after { right: -10px; }
+    .calendar-title { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; font-weight: 600; font-size: 15px; }
+    .calendar-title svg { color: var(--gold-soft); }
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+    .chip {
+      padding: 10px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .chip:hover { border-color: #fff; }
+    .cancelled { padding: 18px; border: 1px solid rgba(232, 201, 143, 0.5); border-radius: 10px; font-size: 15px; line-height: 1.55; }
+    .cancelled p { margin: 0 0 6px; }
+    .cancelled p:last-child { margin: 0; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    /* ---------- Mobile ---------- */
+    @media (max-width: 800px) {
+      .corner { width: 54px; height: 39px; }
+      .corner--tl, .corner--tr { display: none; }
+      .corner--bl, .corner--br { bottom: 12px; }
+      .corner--bl { left: 12px; }
+      .corner--br { right: 12px; }
+      .numerals { display: none; }
+      .hero { height: 170px; padding-bottom: 8px; }
+      .hero__disc { bottom: 8px; width: 380px; height: 380px; margin-left: -190px; box-shadow: 0 0 0 6px var(--cream), 0 0 0 7px var(--sand), 0 12px 28px rgba(6, 33, 63, 0.18); }
+      .hero__lockup { margin-bottom: 34px; }
+      .hero__rings { width: 42px; height: 40px; margin-bottom: 6px; }
+      .hero__kicker { font-size: 12px; }
+      .hero__kicker small { font-size: 7px; }
+      .hero__title { font-size: 13px; margin-top: 2px; }
+      .hero__rule { width: 140px; margin-top: 6px; }
+      .hero__rule svg { width: 10px; height: 10px; }
+      .page { max-width: 480px; padding: 24px 18px 80px; }
+      .card { padding: 22px 22px 26px; }
+      .info { grid-template-columns: 1fr; padding: 0; margin-bottom: 28px; }
+      .info__item { flex-direction: row; align-items: flex-start; justify-content: flex-start; gap: 14px; padding: 18px; text-align: left; }
+      .info__item + .info__item { border-left: 0; border-top: 1px solid var(--sand); }
+      .info__icon { width: 40px; height: 40px; margin: 0; }
+      .info__icon svg { width: 16px; height: 16px; }
+      .info__label { font-size: 11px; }
+      .info__value { font-size: 18px; }
+      .info__sub { font-size: 13px; }
+      .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+      .ticket { order: -1; }
+      .stub { flex-direction: column; align-items: stretch; gap: 22px; margin-bottom: 22px; }
+      .qr { width: 180px; height: 180px; margin: 0 auto; }
+      .meta dd { font-size: 19px; margin-bottom: 14px; }
+      .perforation { margin: 26px -22px 22px; }
+      .chip { padding: 9px 14px; font-size: 13px; }
+      .details h1 { font-size: 27px; }
+      .details .intro { font-size: 14px; margin-bottom: 22px; }
+      .row { grid-template-columns: 1fr; gap: 22px; }
+      .field input { height: 46px; font-size: 15px; }
+      .transfer-notice { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="corner corner--tl" aria-hidden="true"></div>
+  <div class="corner corner--tr" aria-hidden="true"></div>
+  <div class="corner corner--bl" aria-hidden="true"></div>
+  <div class="corner corner--br" aria-hidden="true"></div>
+  <div class="numerals" aria-hidden="true">
+    <span style="top:30px;left:98px;font-size:28px">2</span>
+    <span style="top:170px;right:200px;font-size:40px">3</span>
+    <span style="top:190px;right:110px;font-size:64px">5</span>
+    <span style="top:240px;right:60px;font-size:44px">2</span>
+    <span style="top:460px;left:10px;font-size:72px">3</span>
+    <span style="bottom:40px;left:110px;font-size:46px">6</span>
+    <span style="bottom:50px;right:180px;font-size:56px">3</span>
+  </div>
+  <header class="hero">
+    <div class="hero__disc"></div>
+    <div class="hero__lockup">
+      <svg class="hero__rings" viewBox="0 0 84 80" fill="none" stroke="#E8C98F" stroke-width="2.5" aria-hidden="true">
+        <circle cx="42" cy="24" r="21"/>
+        <circle cx="29" cy="50" r="21"/>
+        <circle cx="55" cy="50" r="21"/>
+      </svg>
+      <p class="hero__kicker"><span class="spark">✦</span>Encuentro Anual <small>de</small><span class="spark">✦</span></p>
+      <p class="hero__title">NÚMEROS, ESPIRITUALIDAD<br><span class="spark">✦</span><i>y</i> CONSCIENCIA<span class="spark">✦</span></p>
+      <div class="hero__rule">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 0l1.4 8.6L20 10l-8.6 1.4L10 20l-1.4-8.6L0 10l8.6-1.4z"/></svg>
+      </div>
+    </div>
+  </header>
+  <main class="page">
+    <!-- ===== Event info ===== -->
+    <section class="info" aria-label="Información del evento">
+      {%- if attendee.event_start_at_date -%}
+        {%- assign month_index = attendee.event_start_at | date: "%-m" | minus: 1 -%}
+        {%- assign day_index = attendee.event_start_at | date: "%w" | plus: 0 -%}
+        <div class="info__item">
+          <span class="info__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7.5 14h.01M12 14h.01M16.5 14h.01M7.5 17.5h.01M12 17.5h.01"/></svg>
+          </span>
+          <div>
+            <p class="info__label">Fecha</p>
+            <p class="info__value">{{ attendee.event_start_at | date: "%-d" }} de {{ months_es[month_index] }} de {{ attendee.event_start_at | date: "%Y" }}</p>
+            <p class="info__sub">{{ days_es[day_index] }}</p>
+          </div>
+        </div>
+      {%- endif -%}
+      {%- if attendee.event_location_type == 'online' -%}
+        <div class="info__item">
+          <span class="info__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          </span>
+          <div>
+            <p class="info__label">Lugar</p>
+            <p class="info__value">
+              {%- if attendee.show_virtual_event_url and attendee.virtual_event_url -%}
+                <a href="{{ attendee.virtual_event_url }}" target="_blank" rel="noopener">{{ "events.general.location_online" | t }}</a>
+              {%- else -%}
+                {{ "events.general.location_online" | t }}
+              {%- endif -%}
+            </p>
+          </div>
+        </div>
+      {%- elsif attendee.event_location_name != empty and attendee.event_location_name != nil -%}
+        {%- comment -%} "Venue, street, city" → venue in bold, the rest as the address line. {%- endcomment -%}
+        {%- assign loc_parts = attendee.event_location_name | split: ", " -%}
+        {%- assign loc_title = loc_parts.first -%}
+        {%- assign loc_address = attendee.event_location_name | remove_first: loc_title | remove_first: ", " -%}
+        <div class="info__item">
+          <span class="info__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+          </span>
+          <div>
+            <p class="info__label">Lugar</p>
+            <p class="info__value">
+              {%- if attendee.event_location_url != empty and attendee.event_location_url != nil -%}
+                <a href="{{ attendee.event_location_url }}" target="_blank" rel="noopener">{{ loc_title }}</a>
+              {%- else -%}
+                {{ loc_title }}
+              {%- endif -%}
+            </p>
+            {%- if loc_address != blank -%}<p class="info__sub">{{ loc_address }}</p>{%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+      {%- if attendee.event_start_at -%}
+        {%- assign start_time = attendee.event_start_at | date: "%-I:%M %p" | downcase | replace: "am", "a. m." | replace: "pm", "p. m." -%}
+        {%- assign end_time = attendee.event_end_at | date: "%-I:%M %p" | downcase | replace: "am", "a. m." | replace: "pm", "p. m." -%}
+        <div class="info__item">
+          <span class="info__icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <div>
+            <p class="info__label">Horario</p>
+            <p class="info__value">{{ start_time }}{% if attendee.event_end_at %} – {{ end_time }}{% endif %}</p>
+          </div>
+        </div>
+      {%- endif -%}
+    </section>
+    <div class="grid">
+      <!-- ===== Details form ===== -->
+      <section class="card details" aria-labelledby="details-title">
+        <div class="badge">Tus datos</div>
+        <h1 id="details-title">Detalles del boleto</h1>
+        <p class="intro">Confirma tu nombre y correo electrónico. Así aparecerán en tu boleto y a ese correo lo enviaremos.</p>
+        {%- assign transfers_disabled = false -%}
+        {%- if event.allow_transfers == false -%}{%- assign transfers_disabled = true -%}{%- endif -%}
+        <form id="details-form" action="" method="post">
+          <div class="row">
+            <label class="field">
+              <span>Nombre</span>
+              <input name="attendee[first_name]" type="text" value="{{ attendee.first_name }}" autocomplete="given-name" placeholder="Ingresa tu nombre" required {% if transfers_disabled %}disabled{% endif %}>
+            </label>
+            <label class="field">
+              <span>Apellido</span>
+              <input name="attendee[last_name]" type="text" value="{{ attendee.last_name }}" autocomplete="family-name" placeholder="Ingresa tu apellido" required {% if transfers_disabled %}disabled{% endif %}>
+            </label>
+          </div>
+          <label class="field">
+            <span>Correo electrónico</span>
+            <input id="emailphone" name="attendee[email]" type="email" value="{{ attendee.email }}" autocomplete="email" placeholder="nombre@correo.com" required {% if transfers_disabled %}disabled{% endif %}>
+          </label>
+          {%- assign ticket_attributes_count = 0 -%}
+          {%- for attr in attendee.ticket_attributes -%}
+            {%- if attr.spec.type == 'text' -%}
+              {%- assign t_label = "events.general." | append: attr.spec.name -%}
+              <label class="field">
+                <span>{{ t_label | t | default: attr.spec.label }}</span>
+                <input name="attendee[attendee_attributes][{{ attr.spec.name }}]" type="text" value="{{ attr.value }}" {% if attr.spec.readonly_ticket_page == true %}disabled{% endif %}>
+              </label>
+            {%- endif -%}
+            {%- if attr.spec.readonly_ticket_page != true -%}
+              {%- assign ticket_attributes_count = ticket_attributes_count | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if flash.notice != nil and flash.notice != empty -%}
+            {%- assign notice_translation_code = "events.ticket_page.notice_" | append: flash.notice_code -%}
+            <div class="flash">{{ notice_translation_code | t }}</div>
+          {%- endif -%}
+          {%- if event.allow_transfers or ticket_attributes_count > 0 -%}
+            <button id="submit-button" type="submit">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+              <span id="submit-label">Actualizar detalles del boleto</span>
+            </button>
+          {%- endif -%}
+        </form>
+        {%- if event.allow_transfers -%}
+          <p class="transfer-notice" role="note">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Si cambias el correo electrónico, generaremos un nuevo boleto y lo enviaremos a la nueva dirección. El boleto actual dejará de ser válido.</span>
+          </p>
+        {%- endif -%}
+      </section>
+      <!-- ===== Ticket ===== -->
+      <section class="card ticket" aria-label="Tu boleto">
+        <div class="badge">Tu boleto</div>
+        {%- if attendee.cancelled? -%}
+          <div class="cancelled">
+            {%- if attendee.transferred_to -%}
+              <p>{{ "events.ticket_page.transferred_message" | t }}</p>
+              <p>{{ "events.ticket_page.transferred_to" | t }}: {{ attendee.transferred_to.phone | default: attendee.transferred_to.email }}</p>
+              <p>{{ "events.ticket_page.transfer_date" | t }}: {{ attendee.transferred_to.created_at | date: "%d/%m/%Y" }}</p>
+            {%- else -%}
+              <p>{{ "events.ticket_page.cancelled_message" | t }}</p>
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          <div class="stub">
+            <div class="qr">
+              <img alt="Código QR del boleto" src="data:image/png;base64,{{ qr_data }}">
+            </div>
+            <dl class="meta">
+              <dt>Fecha de emisión</dt>
+              <dd>{{ attendee.purchased_on | date: "%d/%m/%Y" }}</dd>
+              <dt>Número de boleto</dt>
+              <dd>#{{ attendee.ticket_code }}</dd>
+              <dt>Tipo de boleto</dt>
+              <dd>{{ attendee.ticket.title }}{% if event.has_seating %} · {{ attendee.seat_label }}{% endif %}</dd>
+            </dl>
+          </div>
+          <div class="actions">
+            {%- if event.has_pdf_ticket_type -%}
+              <a class="btn btn--pdf" href="{{ attendee.pdf_ticket_url }}" target="_blank" rel="noopener">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+                Descargar PDF
+              </a>
+            {%- endif -%}
+            {%- if event.has_passbook_ticket_type -%}
+              <a class="btn btn--wallet" href="{{ attendee.passbook_ticket_url }}" target="_blank" rel="noopener">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10h18M16 15h2M7 6V4h10v2"/></svg>
+                Agregar a Apple Wallet
+              </a>
+            {%- endif -%}
+          </div>
+          {%- if event.has_calendar_options and attendee.event_start_at_date -%}
+            <div class="perforation" aria-hidden="true"></div>
+            <div class="calendar">
+              <p class="calendar-title">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>
+                Agregar al calendario
+              </p>
+              <div class="chips">
+                <a class="chip" href="{{ attendee.add_to_calendar_google_url }}" target="_blank" rel="noopener">Google Calendar</a>
+                <a class="chip" href="{{ attendee.add_to_calendar_outlook_url }}" target="_blank" rel="noopener">Outlook</a>
+                <a class="chip" href="{{ attendee.ics_ticket_url }}" target="_blank" rel="noopener">Otros calendarios</a>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endif -%}
+      </section>
+    </div>
+  </main>
+  <script evey>
+    (function () {
+      var email = document.getElementById('emailphone');
+      var form = document.getElementById('details-form');
+      var button = document.getElementById('submit-button');
+      var label = document.getElementById('submit-label');
+      if (email && label) {
+        var original = email.value;
+        email.addEventListener('input', function () {
+          label.textContent = email.value !== original
+            ? "{{ "events.ticket_page.update_transfer" | t }}"
+            : "Actualizar detalles del boleto";
+        });
+      }
+      if (form && button) {
+        form.addEventListener('submit', function () { button.disabled = true; });
+      }
+      window.history.replaceState({}, document.title, "{{ attendee.ticket_url }}");
+    })();
+  </script>
+</body>
+</html>
+{% schema %}
+{
+  "name": "Ticket page",
+  "type": "template",
+  "blocks": [],
+  "settings": []
+}
+{% endschema %}
